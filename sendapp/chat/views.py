@@ -1,30 +1,21 @@
-from django.shortcuts import render
-from django.views import View
-from . import models
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from django.contrib import messages
+from chat.form import UserRegistrationForm
 
-# Create your views here.
+def home(request):
+    return render(request, 'chat/home.html')
 
-class Login(View):
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
 
-    def get(self, request):
-        return render(request, template_name="chat/login.html")
+            messages.success(request, f'Your account has been created. You can log in now!')    
+            return redirect('login')
+    else:
+        form = UserRegistrationForm()
 
-    def post(self, request):
-        username = request.POST.get("username", False)
-        password = request.POST.get("password", False)
-        return render(request, "chat/home.html", {"username": username, "password": password})
-
-class Register(View):
-
-    def get(self, request):
-        return render(request, template_name="chat/register.html")
-
-    def post(self, request):
-        user = models.User()
-        user.username = request.POST.get("username", False)
-        user.first_name = request.POST.get("first_name", False)
-        user.last_name = request.POST.get("last_name", False)
-        user.email = request.POST.get("email", False)
-        user.password = request.POST.get("password", False)
-        user.save()
-        return render(request, template_name="chat/register.html")
+    context = {'form': form}
+    return render(request, 'chat/register.html', context)
