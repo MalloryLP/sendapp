@@ -1,12 +1,53 @@
-{% if user.is_authenticated %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Home</title>
+    </head>
+
+    <body>
+
+    {% if user.is_authenticated %}
+
     <div class="alert alert-success" role="alert">
-        <h3>Welcome {{ user.username }}!</h3>
+        <h3>Bienvenue {{ user.username }}!</h3>
         <a href="{% url 'logout' %}">Logout?</a>
     </div>
-{% else %}
+
+    {% else %}
+
     <div class="alert alert-success" role="alert">
-        <h3>Welcome!</h3>
+        <h3>Bienvenue, vous n'êtes pas connecté !</h3>
         <a href="{% url 'register' %}">Signup</a>
         <a href="{% url 'login' %}">Login</a>
     </div>
-{% endif %}
+
+    {% endif %}
+    
+
+    <script type="module">
+
+        import * as wcb from "{% static 'chat/js/encryption/webcryptobox.js' %}"        
+
+        var crsftoken = '{{ csrf_token }}'
+
+        const { privateKey, publicKey } = await wcb.generateKeyPair()
+        const pub = await wcb.exportPublicKeyPem(publicKey)
+        const pri = await wcb.exportPrivateKeyPem(privateKey)
+
+        function sendInfos(){
+            const requestObj = new XMLHttpRequest()
+            requestObj.open('POST', "{% url 'api' %}")
+            requestObj.setRequestHeader("X-CSRFToken", crsftoken)
+            requestObj.send(JSON.stringify({
+                "user": '{{ user.username }}',
+                "publicKey": pub
+            }))
+        }
+        window.onload = sendInfos();
+        
+
+    </script>
+
+    </body>
+</html>

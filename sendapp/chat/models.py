@@ -20,3 +20,7 @@ class Message(models.Model):
     sender_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
     receiver_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')
     timestamp = models.TimeField(auto_now_add=True)
+
+class PublicKey(models.Model):
+    owner = models.TextField()
+    value = models.TextField()
