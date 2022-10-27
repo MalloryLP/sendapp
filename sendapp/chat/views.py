@@ -1,33 +1,25 @@
-from django.shortcuts import render, redirect
-from chat.form import UserRegistrationForm
 from django.views import View
+from django.shortcuts import render, redirect
+
+from django.contrib.auth import get_user_model
 
 import json
 
 from chat.models import PublicKey
 
+User = get_user_model()
+
 class Home(View):
 
     def get(self, request):
-        return render(request, 'chat/home.html')
+        #print("first id", User.objects.get(username='nadir.ziani').id)
+        #print("second id", request.user.id)
+        users = User.objects.exclude(username=request.user.username)
+        print(users)
+        return render(request, 'chat/home.html', context={'users': users})
 
     def post(self, request):
         return render(request, 'chat/home.html')
-
-class Register(View):
-
-    def get(self, request):
-        form = UserRegistrationForm()
-        context = {'form': form}
-        return render(request, 'chat/register.html', context)
-
-    def post(self, request):
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            form.save()   
-            return redirect('login')
-        context = {'form': form}
-        return render(request, 'chat/register.html', context)
 
 class EncryptionKey(View):
 
@@ -35,16 +27,22 @@ class EncryptionKey(View):
         pass
 
     def post(self, request):
-        #print(request.headers)
-        #print(request.body)
 
         body = json.loads(request.body.decode('utf-8'))
-        print(body)
+        owner = body["user"]
+        value = body["publicKey"]
 
-        publicKey = PublicKey()
+        if PublicKey.objects.filter(owner=owner).exists():
+            print("Public key updated !")
+            obj, created = PublicKey.objects.update_or_create(owner = owner, defaults={"value": value})
+        else:
+            print("Public key created !")
+            publicKey = PublicKey()
+            
+            publicKey.owner = owner
+            publicKey.value = value
+            publicKey.save()
+
         
-        publicKey.owner = body["user"]
-        publicKey.value = body["publicKey"]
-        publicKey.save()
 
         return render(request, 'chat/home.html')

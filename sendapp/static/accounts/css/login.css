@@ -1,0 +1,114 @@
+body {
+  background: rgb(0,4,40);
+  background: linear-gradient(32deg, rgba(0,4,40,1) 0%, rgba(0,78,146,1) 100%);
+ }
+ 
+.login-container {
+    width: 100%;
+    display: flex;
+    overflow: auto;
+    min-height: 100vh;
+    align-items: center;
+    border-width: 1px;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .login-form {
+    width: 376px;
+    height: 200px;
+    position: relative;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px 0px #000000;
+  }
+  .password {
+    left: 0px;
+    right: 0px;
+    width: 327px;
+    height: 25px;
+    bottom: 70px;
+    margin: auto;
+    position: absolute;
+    border-radius: 5px;
+    border-width: 1px;
+  }
+  .username {
+    left: 0px;
+    right: 0px;
+    width: 327px;
+    height: 25px;
+    bottom: 103px;
+    margin: auto;
+    position: absolute;
+    border-radius: 5px;
+    border-width: 1px;
+  }
+  .loginbtn {
+    left: 0px;
+    right: 0px;
+    width: 251px;
+    bottom: 35px;
+    margin: auto;
+    display: flex;
+    position: absolute;
+    font-style: normal;
+    text-align: justify;
+    font-weight: 400;
+    text-transform: capitalize;
+    justify-content: center;
+    background-color: rgb(21, 152, 0);
+    border-radius: 10px;
+  }
+  .loginbtn:hover{
+    background-color: #1ac704; 
+  }
+  .registerbtn {
+    left: 190px;
+    width: 108px;
+    bottom: 10px;
+    margin: auto;
+    display: flex;
+    position: absolute;
+    font-size: 13px;
+    font-style: normal;
+    text-align: center;
+    font-family: Roboto;
+    font-weight: 700;
+  }
+  .register {
+    left: 63px;
+    bottom: 10px;
+    position: absolute;
+    font-size: 13px;
+    font-style: normal;
+    text-align: center;
+    font-family: Roboto;
+    font-weight: 700;
+  }
+  .login {
+    top: 20px;
+    left: 0px;
+    right: 0px;
+    margin: auto;
+    position: absolute;
+    font-size: 30px;
+    font-style: normal;
+    text-align: center;
+    font-family: Roboto;
+    font-weight: 700;
+  }
+  .enstalogo {
+    left: 0px;
+    width: 150px;
+    bottom: 0px;
+    height: 50px;
+    position: absolute;
+    object-fit: cover;
+  }
+
+  .github {
+    fill: #ffffff;
+    width: 24px;
+    height: 24px;
+    margin: 15px;
+  }

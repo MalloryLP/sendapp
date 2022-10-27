@@ -1,0 +1,37 @@
+.header {
+    width: 100%;
+    display: flex;
+    overflow: auto;
+    min-height: 100vh;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .welcomemsg {
+    top: 30px;
+    left: 150px;
+    position: absolute;
+    align-self: flex-start;
+  }
+  .profilicon {
+    top: 10px;
+    left: 10px;
+    width: 124px;
+    height: 119px;
+    position: absolute;
+  }
+  .logoutbtn {
+    top: 92px;
+    left: 150px;
+    width: 108px;
+    height: 30px;
+    margin: auto;
+    display: flex;
+    position: absolute;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background-color: rgba(255, 1, 1, 0.54);
+  }
+  

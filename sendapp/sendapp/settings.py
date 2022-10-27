@@ -32,6 +32,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
 
+LOGOUT_REDIRECT_URL = "login"
+
 # Application definition
 
 INSTALLED_APPS = [

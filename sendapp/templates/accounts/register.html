@@ -1,0 +1,8 @@
+<h3>Register here</h3>
+<hr>
+
+<form action="{% url 'register' %}" method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="Register" class="btn btn-primary">
+</form>
