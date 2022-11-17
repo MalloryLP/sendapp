@@ -31,12 +31,14 @@ ALLOWED_HOSTS = ['*']
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
+#SECURE_CHANNELS = True
 
 LOGOUT_REDIRECT_URL = "login"
 
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sslserver',
+    'accounts',
     'chat',
 ]
 
@@ -77,8 +80,15 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'sendapp.wsgi.application'
+#WSGI_APPLICATION = 'sendapp.wsgi.application'
+ASGI_APPLICATION = 'sendapp.asgi.application'
 
+# LEARN CHANNELS
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

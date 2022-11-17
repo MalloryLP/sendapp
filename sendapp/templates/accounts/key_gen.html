@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+    <html>
+        <head>
+            <title>Old Page</title>
+            <meta charset="UTF-8" />
+            <meta http-equiv="refresh" content="100; URL=https://192.168.10.191:8000/login/" />
+        </head>
+    <body>
+        <p>Key generation.</p>
+
+        <script type="module">
+
+            const asymmetricAlgorithms = [
+            'RSASSA-PKCS1-v1_5',
+            'RSA-PSS',
+            'RSA-OAEP',
+            'ECDSA',
+            'ECDH',
+            ]
+
+            const txtToBuf = (txt) => new TextEncoder().encode(txt)
+            const bufToTxt = (buf) => new TextDecoder().decode(buf)
+
+            const { publicKey, privateKey } = await crypto.subtle.generateKey(
+            {
+            name: asymmetricAlgorithms[2],
+            modulusLength: 4096,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256"
+            },
+            true,
+            ['encrypt', 'decrypt']
+            )
+
+            console.log(publicKey)
+            console.log(privateKey)
+
+            console.log(crypto.subtle.exportKey("jwk", publicKey))
+
+            const txtAsBuf = txtToBuf('Tesser4')
+            console.log(`Text to be encrypted: ${bufToTxt(txtAsBuf)}`) // 'Tesser4'
+
+            const encryptedTxt = await crypto.subtle.encrypt(
+            asymmetricAlgorithms[2],
+            publicKey,
+            txtAsBuf,
+            )
+
+            const decryptedTxt = await crypto.subtle.decrypt(
+            asymmetricAlgorithms[2],
+            privateKey,
+            encryptedTxt,
+            )
+            console.log(`Decrypted text: ${bufToTxt(decryptedTxt)}`) // 'Tesser4'
+
+            //import * as wcb from "{% static 'chat/js/encryption/webcryptobox.js' %}"        
+
+            var crsftoken = '{{ csrf_token }}'
+
+            /*const { privateKey, publicKey } = await wcb.generateKeyPair()
+            const pub = await wcb.exportPublicKeyPem(publicKey)
+            const pri = await wcb.exportPrivateKeyPem(privateKey)
+
+            function sendInfos(){
+            const requestObj = new XMLHttpRequest()
+            requestObj.open('POST', "{% url 'api' %}")
+            requestObj.setRequestHeader("X-CSRFToken", crsftoken)
+            requestObj.send(JSON.stringify({
+            "user": '{{ user.username }}',
+            "publicKey": pub
+            }))
+            }
+            window.onload = sendInfos();
+
+            console.log(pub)
+            console.log(pri)*/
+
+
+        </script>
+    </body>
+</html>

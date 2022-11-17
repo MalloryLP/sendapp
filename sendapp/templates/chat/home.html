@@ -1,15 +1,16 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <link rel="stylesheet" href="{% static 'chat/css/home.css' %}">
-        <title>Home</title>
+        {% block css %}{% endblock %}
+        <title>{% block title %}{% endblock %}</title>
     </head>
 
     <body>
 
     {% if user.is_authenticated %}
-
+        
     <div class="header">
         <h1 class="welcomemsg">Bonjour, {{ user.username }} !</h1>
         <svg viewBox="0 0 1024 1024" class="profilicon">
@@ -19,7 +20,16 @@
         </svg>
         <a class="logoutbtn" href="{% url 'logout' %}">Logout</a>
     </div>
+    <div class="friendscontainer">
+        {% block friends %}{% endblock %}
+    </div>
+    <div class="messagescontainer">
+        {% block messages %}{% endblock %}
+    </div>
 
+    {% block javascript %} {% endblock %}
+    
+    <!--
     {% for user in users %}
     <tr>
         </td>
@@ -28,28 +38,36 @@
     </tr>
     {% endfor %}
 
+-->
     <script type="module">
 
-        import * as wcb from "{% static 'chat/js/encryption/webcryptobox.js' %}"        
+        const asymmetricAlgorithms = [
+        'RSASSA-PKCS1-v1_5',
+        'RSA-PSS',
+        'RSA-OAEP',
+        'ECDSA',
+        'ECDH',
+        ]
 
-        var crsftoken = '{{ csrf_token }}'
+        const txtToBuf = (txt) => new TextEncoder().encode(txt)
+        const bufToTxt = (buf) => new TextDecoder().decode(buf)
 
-        const { privateKey, publicKey } = await wcb.generateKeyPair()
-        const pub = await wcb.exportPublicKeyPem(publicKey)
-        const pri = await wcb.exportPrivateKeyPem(privateKey)
+        const { publicKey, privateKey } = await crypto.subtle.generateKey(
+        {
+            name: asymmetricAlgorithms[2],
+            modulusLength: 4096,
+            publicExponent: new Uint8Array([1, 0, 1]),
+            hash: "SHA-256"
+        },
+        true,
+        ['encrypt', 'decrypt']
+        )
 
-        function sendInfos(){
-            const requestObj = new XMLHttpRequest()
-            requestObj.open('POST', "{% url 'api' %}")
-            requestObj.setRequestHeader("X-CSRFToken", crsftoken)
-            requestObj.send(JSON.stringify({
-                "user": '{{ user.username }}',
-                "publicKey": pub
-            }))
-        }
-        window.onload = sendInfos();
-        
+        console.log(publicKey)
+        console.log(privateKey)
 
+        console.log(crypto.subtle.exportKey("jwk", publicKey))
+      
     </script>
 
     {% else %}

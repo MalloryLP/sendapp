@@ -7,4 +7,5 @@ from chat import views
 urlpatterns = [
     path('home/', views.Home.as_view(), name='home'),
     path('api/', views.EncryptionKey.as_view(), name='api'),
+    path('chat/<str:username>/', views.Chat.as_view(), name='chat')
 ]

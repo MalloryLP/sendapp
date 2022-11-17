@@ -1,0 +1,7 @@
+.friendsheader {
+    top: 2px;
+    left: 10px;
+    position: absolute;
+    align-self: flex-start;
+    font-size: 20px;
+}

@@ -25,7 +25,11 @@ class Register(View):
                                     )
             login(request, new_user)
 
-            return redirect('login')
+            return redirect('gen')
+
+class KeyGen(View):
+    def get(self, request):
+            return render(request, 'accounts/key_gen.html')
 
 class Login(View):
 

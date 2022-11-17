@@ -1,0 +1,76 @@
+{% extends './home.html' %}
+
+{% load static %}
+
+{% block title %}Chat{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'chat/css/chat.css' %}">
+{% endblock %}
+
+{% block friends %}
+
+<span class="friendsheader">Contacts :</span>
+
+{% for user in users %}
+<tr>
+    <td><a href="{% url 'chat' username=user.username%}">{{user.username}}</a></td>
+</tr>
+{% endfor %}
+
+{% endblock %}
+
+{% block messages %}
+
+<div class="message_box">
+    <input type="text" id="message_input" placeholder="Write message...">
+    <button id="chat-message-submit">Submit</button>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+    const id = '{{requested_user_id}}'
+
+    console.log(window.location.host)
+
+    const socket = new WebSocket(
+        'wss://'
+        + '192.168.1.18:8001'
+        + '/ws/'
+        + id
+        + '/'
+    );
+
+    socket.onopen = function(e){
+        console.log("CONNECTION ESTABLISHED");
+    }
+
+    socket.onclose = function(e){
+        console.log("CONNECTION LOST");
+    }
+
+    socket.onerror = function(e){
+        console.log("ERROR OCCURED");
+    }
+
+    document.querySelector('#chat-message-submit').onclick = function(e){
+        const message_input = document.querySelector('#message_input');
+        const message = message_input.value;
+
+        socket.send(JSON.stringify({
+            'message':message,
+            'username':message_username
+        }));
+
+        message_input.value = '';
+    }
+
+    //localStorage.setItem("couleur","vert")
+
+    
+</script>
+
+{% endblock %}

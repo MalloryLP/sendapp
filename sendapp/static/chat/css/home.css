@@ -1,30 +1,68 @@
-.header {
+  .header {
     width: 100%;
+    height: 20%;
     display: flex;
-    overflow: auto;
-    min-height: 100vh;
+    position: absolute;
+    max-width: auto;
+    min-width: auto;
+    align-self: flex-start;
+    max-height: auto;
+    min-height: auto;
     align-items: flex-start;
+    border-color: rgba(120, 120, 120, 0.4);
+    border-style: double;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
   }
-  .welcomemsg {
-    top: 30px;
-    left: 150px;
+  .friendscontainer {
+    top: 20%;
+    flex: 1;
+    width: 30%;
+    height: 80%;
+    display: flex;
     position: absolute;
     align-self: flex-start;
+    max-height: 100%;
+    min-height: auto;
+    align-items: flex-start;
+    border-color: rgba(120, 120, 120, 0.4);
+    border-style: double;
+    flex-direction: column;
+  }
+  .messagescontainer {
+    top: 20%;
+    left: 30%;
+    width: 70%;
+    border: 2px dashed rgba(120, 120, 120, 0.4);
+    height: 80%;
+    display: flex;
+    position: absolute;
+    min-width: auto;
+    align-self: flex-end;
+    align-items: flex-start;
+    border-color: rgba(120, 120, 120, 0.4);
+    border-style: double;
+    flex-direction: column;
+  }
+  .welcomemsg {
+    top: 2px;
+    left: 80px;
+    position: absolute;
+    align-self: flex-start;
+    font-size: 20px;
   }
   .profilicon {
     top: 10px;
     left: 10px;
-    width: 124px;
-    height: 119px;
+    width: 60px;
+    height: 55px;
     position: absolute;
   }
   .logoutbtn {
-    top: 92px;
-    left: 150px;
+    top: 41px;
+    left: 80px;
     width: 108px;
-    height: 30px;
+    height: 21px;
     margin: auto;
     display: flex;
     position: absolute;
@@ -32,6 +70,11 @@
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    background-color: rgba(255, 1, 1, 0.54);
+    background-color: rgb(201, 0, 0);
+    border-radius: 10px;
+  }
+
+  .logoutbtn:hover{
+    background-color: #ff0000; 
   }
   
