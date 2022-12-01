@@ -7,7 +7,7 @@ from channels.layers import get_channel_layer
 
 import json
 
-from chat.models import PublicKey, ChatModel
+from chat.models import ChatModel
 
 User = get_user_model()
 
@@ -51,27 +51,3 @@ class Chat(View):
 
     def post(self, request):
         pass
-
-class EncryptionKey(View):
-
-    def get(self, request):
-        pass
-
-    def post(self, request):
-
-        body = json.loads(request.body.decode('utf-8'))
-        owner = body["user"]
-        value = body["publicKey"]
-
-        if PublicKey.objects.filter(owner=owner).exists():
-            print("Public key updated !")
-            obj, created = PublicKey.objects.update_or_create(owner = owner, defaults={"value": value})
-        else:
-            print("Public key created !")
-            publicKey = PublicKey()
-            
-            publicKey.owner = owner
-            publicKey.value = value
-            publicKey.save()
-
-        return render(request, 'chat/friendsnav.html')

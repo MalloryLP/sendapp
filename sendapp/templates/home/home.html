@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+        {% block css %}{% endblock %}
+        <title>{% block title %}{% endblock %}</title>
+    </head>
+
+    <body>
+
+    {% if user.is_authenticated %}
+
+    <div class="navbar">
+        <svg viewBox="0 0 1024 1024" class="profilicon">
+          <path
+            d="M576 706.612v-52.78c70.498-39.728 128-138.772 128-237.832 0-159.058 0-288-192-288s-192 128.942-192 288c0 99.060 57.502 198.104 128 237.832v52.78c-217.102 17.748-384 124.42-384 253.388h896c0-128.968-166.898-235.64-384-253.388z"
+          ></path>
+        </svg>
+        <a class="logoutbtn" href="{% url 'logout' %}">LOGOUT</a>
+        <a href="{% url 'chat' %}">
+            <svg viewBox="0 0 1024 1024" class="chaticon" >
+                <path
+                d="M768 342v-86h-512v86h512zM598 598v-86h-342v86h342zM256 384v86h512v-86h-512zM854 86q34 0 59 25t25 59v512q0 34-25 60t-59 26h-598l-170 170v-768q0-34 25-59t59-25h684z"
+                ></path>
+            </svg>
+        </a>
+        <svg viewBox="0 0 1024 1024" class="calendaricon">
+            <path
+              d="M854 896v-554h-684v554h684zM854 128q34 0 59 26t25 60v682q0 34-25 60t-59 26h-684q-34 0-59-26t-25-60v-682q0-34 25-60t59-26h44v-86h84v86h428v-86h84v86h44z"
+            ></path>
+        </svg>
+        <svg viewBox="0 0 1024 1024" class="mailicon">
+            <path
+              d="M512 470l342-214h-684zM854 768v-426l-342 212-342-212v426h684zM854 170q34 0 59 26t25 60v512q0 34-25 60t-59 26h-684q-34 0-59-26t-25-60v-512q0-34 25-60t59-26h684z"
+            ></path>
+        </svg>
+        <a href="{% url 'home' %}">
+            <svg viewBox="0 0 1024 1024" class="homeicon">
+                <path
+                d="M426 854h-212v-342h-128l426-384 426 384h-128v342h-212v-256h-172v256z"
+                ></path>
+            </svg>
+        </a>
+    </div>
+
+    {% block infos %}{% endblock %}
+    
+    {% block chat %}{% endblock %} -->
+
+    <!-- <div class="messagescontainer">
+        {% block messages %}{% endblock %}
+    </div> -->
+
+    {% block javascript %} {% endblock %}
+
+    {% else %}
+
+    <div class="alert alert-success" role="alert">
+        <h3>Bienvenue, vous n'êtes pas connecté !</h3>
+        <a href="{% url 'register' %}">Signup</a>
+        <a href="{% url 'login' %}">Login</a>
+    </div>
+
+    {% endif %}
+
+    </body>
+</html>
+

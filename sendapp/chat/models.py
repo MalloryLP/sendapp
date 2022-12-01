@@ -5,10 +5,6 @@ from django.contrib.auth.models import AbstractBaseUser
 
 # Create your models here.
 
-class PublicKey(models.Model):
-    owner = models.TextField()
-    value = models.TextField()
-
 class ChatModel(models.Model):
     sender = models.CharField(max_length=100, default=None)
     message = models.TextField(null=True, blank=True)

@@ -1,0 +1,89 @@
+body {
+  background: rgb(35, 35, 35);
+}
+.navbar {
+  width: 15vw;
+  left: 2vw;
+  top: 2vh;
+  bottom: 2vh;
+  display: flex;
+  position: absolute;
+  max-width: auto;
+  min-width: auto;
+  align-self: flex-start;
+  max-height: auto;
+  min-height: auto;
+  align-items: flex-start;
+  border-style: double;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgb(103, 73, 238);
+  border-radius: 10px;
+  box-shadow: 3px 3px 10px 0px #000000;
+}
+
+.messagescontainer {
+  top: 22vh;
+  left: 20vw;
+  width: 80vw;
+  height: 66vh;
+  display: flex;
+  position: absolute;
+  min-width: auto;
+  align-self: flex-end;
+  align-items: flex-start;
+  border-style: double;
+  flex-direction: column;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10px;
+  box-shadow: 3px 3px 10px 0px #000000;
+}
+
+.profilicon {
+  top: 0vh;
+  display: flex;
+  position: absolute;
+}
+
+.chaticon {
+  top: 30vh;
+  display: flex;
+  position: absolute;
+}
+
+.calendaricon {
+  top: 40vh;
+  display: flex;
+  position: absolute;
+}
+
+.mailicon {
+  top: 50vh;
+  display: flex;
+  position: absolute;
+}
+
+.homeicon {
+  top: 90%;
+  display: flex;
+  position: absolute;
+}
+
+.logoutbtn {
+  top: 150px;
+  left: 2vw;
+  width: 11vw;
+  height: 2vh;
+  display: flex;
+  position: absolute;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background-color: rgb(201, 0, 0);
+  border-radius: 10px;
+}
+
+.logoutbtn:hover{
+  background-color: #ff0000; 
+}

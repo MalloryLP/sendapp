@@ -1,9 +1,8 @@
 from django.contrib import admin
-from . import models
+from chat.models import ChatModel
 
 # Register your models here.
 
-admin.site.register(models.PublicKey)
-admin.site.register(models.ChatModel)
+admin.site.register(ChatModel)
 
 #python manage.py migrate --run-syncdb   

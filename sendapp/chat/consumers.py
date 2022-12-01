@@ -31,3 +31,29 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name
         )
+
+    async def receive(self, text_data=None, bytes_data=None):
+        print("WEBSOCKET RECEIVE")
+        data = json.loads(text_data)
+        message = data['message']
+        username = data['username']
+
+        #await self.save_message(username, self.room_group_name, message)
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message,
+                'username': username,
+            }
+        )
+
+    async def chat_message(self, event):
+        print("WEBSOCKET SEND")
+        message = event['message']
+        username = event['username']
+
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'username': username
+        }))

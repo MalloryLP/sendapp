@@ -1,4 +1,4 @@
-{% extends './home.html' %}
+{% extends '../home/home.html' %}
 
 {% load static %}
 
@@ -8,23 +8,33 @@
 <link rel="stylesheet" href="{% static 'chat/css/chat.css' %}">
 {% endblock %}
 
-{% block friends %}
-
-<span class="friendsheader">Contacts :</span>
-
-{% for user in users %}
-<tr>
-    <td><a href="{% url 'chat' username=user.username%}">{{user.username}}</a></td>
-</tr>
-{% endfor %}
-
+{% block infos%}
+    <div class="infoscontainer">
+        <p class="message">Messagerie instantannée</p>
+    </div>
 {% endblock %}
 
-{% block messages %}
+{% block chat %}
 
-<div class="message_box">
-    <input type="text" id="message_input" placeholder="Write message...">
-    <button id="chat-message-submit">Submit</button>
+<div class="friendscontainer">
+
+    <h1>Amis :</h1>
+
+    {% for user in users %}
+    <tr>
+        <td><a href="{% url 'friendchat' username=user.username%}">{{user.username}}</a></td>
+    </tr>
+    {% endfor %}
+    
+</div>
+
+<div class="chatcontainer">
+    <div id="chat-body">
+    </div>
+    <div class="usercontainer">
+        <input class="message_input" type="text" id="message_input" placeholder="Write message...">
+        <button class="submit-btn" id="chat-message-submit">Send</button>
+    </div>
 </div>
 
 {% endblock %}
@@ -32,13 +42,13 @@
 {% block javascript %}
 <script>
 
-    const id = '{{requested_user_id}}'
-
-    console.log(window.location.host)
+    const username = '{{user.username}}'
+    const id = '{{requested_user_id}}'  
+    var privateKey = null;  
 
     const socket = new WebSocket(
         'wss://'
-        + '192.168.1.18:8001'
+        + '172.20.10.3:8001'
         + '/ws/'
         + id
         + '/'
@@ -62,13 +72,32 @@
 
         socket.send(JSON.stringify({
             'message':message,
-            'username':message_username
+            'username' : username
         }));
 
         message_input.value = '';
     }
 
-    //localStorage.setItem("couleur","vert")
+    socket.onmessage = function(e){
+        const data = JSON.parse(e.data);
+        document.querySelector('#chat-body').innerHTML += `<h1>${data.username} : ${data.message}<\h1><hr>`;
+        console.log(data.username)
+    }
+
+    function getPrivateKey(){
+
+        function reqListener() {
+            privateKey = this.response;
+        }
+
+        const req = new XMLHttpRequest();
+        req.addEventListener("load", reqListener);
+        req.open("GET", "{% url 'api' %}");
+        req.send();
+
+    }
+    
+    getPrivateKey();
 
     
 </script>

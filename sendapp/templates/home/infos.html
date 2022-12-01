@@ -1,0 +1,23 @@
+{% extends '../home/home.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'home/css/infos.css' %}">
+{% endblock %}
+
+{% block title %}Home{% endblock %}
+
+{% block infos %}
+
+    <div class="usercontainer">
+        <h1 class="message">Bonjour {{user.username}}</h1>
+    </div>
+
+    <div class="devcontainer">
+        <h1 class="message">Le site est en cours de construction</h1>
+    </div>
+
+{% endblock %}
+
+

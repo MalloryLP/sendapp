@@ -1,21 +1,4 @@
-.friendscontainer {
-    top: 10vh;
-    left: 20vw;
-    width: 78vw;
-    height: 10vh;
-    display: flex;
-    position: absolute;
-    align-self: flex-start;
-    max-height: 100%;
-    min-height: auto;
-    align-items: flex-start;
-    flex-direction: column;
-    background-color: rgb(255, 255, 255);
-    border-radius: 10px;
-    box-shadow: 3px 3px 10px 0px #000000;
-  }
-
-.infoscontainer {
+.usercontainer {
     top: 2vh;
     left: 20vw;
     width: 80vw;
@@ -27,14 +10,29 @@
     min-height: auto;
     align-items: flex-start;
     flex-direction: column;
-}
+  }
+
+.devcontainer {
+    top: 15vh;
+    left: 20vw;
+    width: 80vw;
+    height: 10vh;
+    display: flex;
+    position: absolute;
+    align-self: flex-start;
+    max-height: 100%;
+    min-height: auto;
+    align-items: flex-start;
+    flex-direction: column;
+    background-color: rgb(55, 55, 55);
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px 0px #222222;
+  }
 
 .message {
     color: rgb(255, 255, 255);
     display: flex;
     position: absolute;
-    top: 1vh;
+    top: 3vh;
     left: 5vw;
-    font-size: 40px;
-    font-weight: bold;
 }

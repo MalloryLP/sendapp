@@ -1,21 +1,31 @@
-{% extends './home.html' %}
+{% extends '../home/home.html' %}
 
 {% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Chat{% endblock %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'chat/css/friendsnav.css' %}">
 {% endblock %}
 
-{% block friends %}
+{% block infos%}
+    <div class="infoscontainer">
+        <p class="message">Messagerie instantannée</p>
+    </div>
+{% endblock %}
 
-<span class="friendsheader">Contacts :</span>
+{% block chat %}
 
-{% for user in users %}
-<tr>
-    <td><a href="{% url 'chat' username=user.username%}">{{user.username}}</a></td>
-</tr>
-{% endfor %}
+<div class="friendscontainer">
+
+    <h1>Amis :</h1>
+
+    {% for user in users %}
+    <tr>
+        <td><a href="{% url 'friendchat' username=user.username%}">{{user.username}}</a></td>
+    </tr>
+    {% endfor %}
+    
+</div>
 
 {% endblock %}

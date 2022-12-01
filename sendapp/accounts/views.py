@@ -1,8 +1,13 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
 
 from accounts.forms import CustomUserRegisterForm
+
+from accounts.models import PrivateKey, PublicKey
+
+import json
 
 # Create your views here.
 
@@ -27,10 +32,6 @@ class Register(View):
 
             return redirect('gen')
 
-class KeyGen(View):
-    def get(self, request):
-            return render(request, 'accounts/key_gen.html')
-
 class Login(View):
 
     def get(self, request):
@@ -51,3 +52,45 @@ class Login(View):
                 return redirect('home')
         else:
             return render(request, 'accounts/login.html')
+
+class KeyGen(View):
+    def get(self, request):
+        return render(request, 'accounts/key_gen.html')
+
+class EncryptionKey(View):
+
+    def get(self, request):
+        print("ENCRYPTION GET")
+        return JsonResponse({'foo':'bar'})
+
+    def post(self, request):
+
+        body = json.loads(request.body.decode('utf-8'))
+        print(body)
+        owner = body["user"]
+        pub = body["publicKey"]
+        pri = body["privateKey"]
+
+        if PublicKey.objects.filter(owner=owner).exists():
+            print("Public key updated !")
+            obj, created = PublicKey.objects.update_or_create(owner = owner, defaults={"pub": pub})
+        else:
+            print("Public key created !")
+            publicKey = PublicKey()
+            
+            publicKey.owner = owner
+            publicKey.pub = pub
+            publicKey.save()
+
+        if PrivateKey.objects.filter(owner=owner).exists():
+            print("Private key updated !")
+            obj, created = PrivateKey.objects.update_or_create(owner = owner, defaults={"pri": pri})
+        else:
+            print("Private key created !")
+            privatekey = PrivateKey()
+            
+            privatekey.owner = owner
+            privatekey.pri = pri
+            privatekey.save()
+
+        return render(request, 'chat/friendsnav.html')
