@@ -4,12 +4,25 @@
         <head>
             <title>Generating Keys</title>
             <meta charset="UTF-8" />
-            <meta http-equiv="refresh" content="5; URL={% url 'login' %}" />
+
+            <style>
+                body {background: rgb(35, 35, 35);}
+            </style>
         </head>
     <body>
-        <p>Key generation.</p>
-
         <script type="module">
+
+                function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
+                    var crsftoken = '{{ csrf_token }}'
+                    const requestObj = new XMLHttpRequest()
+                    requestObj.open('POST', "{% url 'api' %}")
+                    requestObj.setRequestHeader("X-CSRFToken", crsftoken)
+                    requestObj.send(JSON.stringify({
+                        "user": '{{ user.username }}',
+                        "publicKey": f_exportedPublicKey,
+                        "privateKey": f_exportedPrivateKey
+                    }))
+                }
 
             function generateKey(alg, scope) {
                 return new Promise(function(resolve) {
@@ -193,7 +206,7 @@
             var crypto = window.crypto || window.msCrypto
             if (crypto.subtle) {
                 var _signedData
-                var message = "test"
+                var message = "Quelle est la reponse de la vie ? 42."
                 var scopeSign = ["sign", "verify"]
                 var scopeEncrypt = ["encrypt", "decrypt"]
                 var vector = crypto.getRandomValues(new Uint8Array(16))
@@ -240,30 +253,22 @@
                     return result
                 })
 
-                message = "Ce message vient d'être déchiffré"
-
                 var encryptedData = await encryptData(vector, keys.publicKey, message).then(function(encryptedData){
-                    console.log(arrayBufferToBase64(encryptedData))
                     return encryptedData
                 })
 
                 var result = await decryptData(vector, keys.privateKey, encryptedData).then(function(result){
-                    console.log(arrayBufferToText(result))
                     return result
                 })
 
-                function sendInfos(){
-                    var crsftoken = '{{ csrf_token }}'
-                    const requestObj = new XMLHttpRequest()
-                    requestObj.open('POST', "{% url 'api' %}")
-                    requestObj.setRequestHeader("X-CSRFToken", crsftoken)
-                    requestObj.send(JSON.stringify({
-                        "user": '{{ user.username }}',
-                        "publicKey": exportedPublicKey,
-                        "privateKey": exportedPrivateKey
-                    }))
+                console.log(arrayBufferToText(result))
+
+                if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
+                    window.onload = sendInfos(exportedPublicKey, exportedPrivateKey);
+                }else{
+                    window.onload = sendInfos("no_key", "no_key");
                 }
-                window.onload = sendInfos();
+                window.location.href = "{% url 'login' %}"
 
             }
 

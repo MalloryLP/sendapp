@@ -113,3 +113,9 @@ input[type="password"]
   height: 4vh;
   margin: 15px;
 }
+
+.error_msg {
+  color: red;
+  font-size: 30px;
+  font-weight: bold;
+}

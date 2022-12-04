@@ -1,8 +1,20 @@
-<h3>Register here</h3>
-<hr>
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{% static 'accounts/css/register.css' %}">
+        <title>Register</title>
+    </head>
 
-<form action="{% url 'register' %}" method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="Register" class="btn btn-primary">
-</form>
+    <body>
+        <div class="register-container">
+            <form class="register-form" action="{% url 'register' %}" method="post">
+                {% csrf_token %}
+                {{form.username}}
+                {{form.password1}}
+                {{form.password2}}
+                <input type="submit" value="Register" class="btn btn-primary">
+            </form>
+        </div>
+    </body>
+</html>

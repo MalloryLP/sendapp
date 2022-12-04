@@ -44,11 +44,12 @@
 
     const username = '{{user.username}}'
     const id = '{{requested_user_id}}'  
-    var privateKey = null;  
+    var friendPrivateKey = null;  
+    var publicKey = null;
 
     const socket = new WebSocket(
         'wss://'
-        + '172.20.10.3:8001'
+        + '192.168.1.124:8001'
         + '/ws/'
         + id
         + '/'
@@ -84,20 +85,22 @@
         console.log(data.username)
     }
 
-    function getPrivateKey(){
+    function getKeys(){
 
         function reqListener() {
             privateKey = this.response;
+            console.log(privateKey)
         }
 
         const req = new XMLHttpRequest();
         req.addEventListener("load", reqListener);
         req.open("GET", "{% url 'api' %}");
+        req.setRequestHeader("User", username);//to get private key of the user
         req.send();
 
     }
     
-    getPrivateKey();
+    getKeys();
 
     
 </script>

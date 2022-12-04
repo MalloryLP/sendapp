@@ -7,7 +7,7 @@ from accounts.forms import CustomUserRegisterForm
 
 from accounts.models import PrivateKey, PublicKey
 
-import json
+import json, time
 
 # Create your views here.
 
@@ -51,7 +51,7 @@ class Login(View):
                 login(request, user)
                 return redirect('home')
         else:
-            return render(request, 'accounts/login.html')
+            return render(request, 'accounts/login.html', context={"login_error" : "Nom d'utilisateur ou mot de passe incorrect."})
 
 class KeyGen(View):
     def get(self, request):
@@ -59,14 +59,26 @@ class KeyGen(View):
 
 class EncryptionKey(View):
 
+    def isTheUserOK(user):
+        if PublicKey.objects.get(owner=user).pub in "no_key":
+            if PrivateKey.objects.get(owner=user).pri in"no_key":
+                return True
+        return False
+
     def get(self, request):
-        print("ENCRYPTION GET")
-        return JsonResponse({'foo':'bar'})
+        if PublicKey.objects.filter(owner=request.headers["Referer"].split("/")[-2]).exists():
+            obj1 = PublicKey.objects.get(owner = request.headers["Referer"].split("/")[-2])
+
+            if PrivateKey.objects.filter(owner=request.headers["User"]).exists():
+                obj2 = PrivateKey.objects.get(owner = request.headers["User"])
+
+                return JsonResponse({'publicKey': obj1.pub, 'privateKey': obj2.pri})
+        
+        return JsonResponse({'publicKey': None, 'privateKey': None})
 
     def post(self, request):
 
         body = json.loads(request.body.decode('utf-8'))
-        print(body)
         owner = body["user"]
         pub = body["publicKey"]
         pri = body["privateKey"]
