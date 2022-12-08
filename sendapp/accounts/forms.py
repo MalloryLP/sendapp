@@ -4,12 +4,29 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
   
 class CustomUserRegisterForm(UserCreationForm):  
-    username = forms.CharField(label='Username', min_length=5, max_length=150)  
-    email = forms.EmailField(label='Email')
-    first_name = forms.CharField(label='First name')
-    last_name = forms.CharField(label='Last name')
-    password1 = forms.CharField(label='Enter password', widget=forms.PasswordInput)  
-    password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput)  
+    username = forms.CharField(label='Username', min_length=5, max_length=150, widget=forms.TextInput(attrs={   'class': "input-form",
+                                                                                                                'placeholder': 'Username',
+                                                                                                                'style': "--top_level: 1vh;"}))  
+    
+    email = forms.EmailField(label='Email', widget=forms.TextInput(attrs={  'class': "input-form",
+                                                                            'placeholder': 'Email',
+                                                                            'style': "--top_level: 16vh;"}))
+
+    first_name = forms.CharField(label='First name', widget=forms.TextInput(attrs={ 'class': "input-form",
+                                                                                    'placeholder': 'Prénom',
+                                                                                    'style': "--top_level: 6vh;"}))
+
+    last_name = forms.CharField(label='Last name', widget=forms.TextInput(attrs={   'class': "input-form",
+                                                                                    'placeholder': 'Nom',
+                                                                                    'style': "--top_level: 11vh;"}))
+
+    password1 = forms.CharField(label='Enter password', widget=forms.PasswordInput(attrs={  'class': "input-form",
+                                                                                            'placeholder': 'Mot de passe',
+                                                                                            'style': "--top_level: 21vh;"})) 
+
+    password2 = forms.CharField(label='Confirm password', widget=forms.PasswordInput(attrs={'class': "input-form",
+                                                                                            'placeholder': 'Confirmation du mot de passe',
+                                                                                            'style': "--top_level: 26vh;"}))  
   
     def username_clean(self):  
         username = self.cleaned_data['username'].lower()  

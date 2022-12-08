@@ -7,13 +7,19 @@
     </head>
 
     <body>
+        <span class="registerlogo">Se créer un compte.</span>
         <div class="register-container">
             <form class="register-form" action="{% url 'register' %}" method="post">
                 {% csrf_token %}
-                {{form.username}}
-                {{form.password1}}
-                {{form.password2}}
-                <input type="submit" value="Register" class="btn btn-primary">
+                <span>{{form.username}}</span>
+                <span>{{form.first_name}}</span>
+                <span>{{form.last_name}}</span>
+                <span>{{form.email}}</span>
+                <span>{{form.password1}}</span>
+                <span>{{form.password2}}</span>
+                <input type="submit" value="S'enregistrer" class="registerbtn">
+                <span class="login">Déjà membre ?</span>
+                <a class="loginbtn" href="{% url 'login' %}">Se connecter</a>
             </form>
         </div>
     </body>

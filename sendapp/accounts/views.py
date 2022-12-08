@@ -73,7 +73,6 @@ class EncryptionKey(View):
                 obj2 = PrivateKey.objects.get(owner = request.headers["User"])
 
                 return JsonResponse({'publicKey': obj1.pub, 'privateKey': obj2.pri})
-        
         return JsonResponse({'publicKey': None, 'privateKey': None})
 
     def post(self, request):

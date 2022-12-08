@@ -12,23 +12,23 @@
     <body>
         <script type="module">
 
-                function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
-                    var crsftoken = '{{ csrf_token }}'
-                    const requestObj = new XMLHttpRequest()
-                    requestObj.open('POST', "{% url 'api' %}")
-                    requestObj.setRequestHeader("X-CSRFToken", crsftoken)
-                    requestObj.send(JSON.stringify({
-                        "user": '{{ user.username }}',
-                        "publicKey": f_exportedPublicKey,
-                        "privateKey": f_exportedPrivateKey
-                    }))
-                }
+            function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
+                var crsftoken = '{{ csrf_token }}'
+                const requestObj = new XMLHttpRequest()
+                requestObj.open('POST', "{% url 'api' %}")
+                requestObj.setRequestHeader("X-CSRFToken", crsftoken)
+                requestObj.send(JSON.stringify({
+                    "user": '{{ user.username }}',
+                    "publicKey": f_exportedPublicKey,
+                    "privateKey": f_exportedPrivateKey
+                }))
+            }
 
             function generateKey(alg, scope) {
                 return new Promise(function(resolve) {
                     var genkey = crypto.subtle.generateKey(alg, true, scope)
                     genkey.then(function (pair) {
-                    resolve(pair)
+                        resolve(pair)
                     })
                 })
             }
@@ -212,8 +212,6 @@
                 var vector = crypto.getRandomValues(new Uint8Array(16))
             
                 var keys = await generateKey(encryptAlgorithm, scopeEncrypt).then(function(keys){
-                    console.log(keys)
-                    console.log(keys.publicKey)
                     return keys
                 })
 
@@ -244,12 +242,10 @@
                 
                 //RAW TEST
                 var importedPublicKey = await importPublicKey(exportedPublicKey).then(function(result){
-                    console.log(result)
                     return result
                 })
 
                 var importedPrivateKey = await importPrivateKey(exportedPrivateKey).then(function(result){
-                    console.log(result)
                     return result
                 })
 

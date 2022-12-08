@@ -42,10 +42,8 @@
 {% block javascript %}
 <script>
 
-    const username = '{{user.username}}'
-    const id = '{{requested_user_id}}'  
-    var friendPrivateKey = null;  
-    var publicKey = null;
+    const username = '{{user.username}}';
+    const id = '{{requested_user_id}}';
 
     const socket = new WebSocket(
         'wss://'
@@ -54,6 +52,14 @@
         + id
         + '/'
     );
+    
+    const headers = new Headers();
+    headers.append("User", username);
+
+    const options = {
+        method: "GET",
+        headers: headers
+    };
 
     socket.onopen = function(e){
         console.log("CONNECTION ESTABLISHED");
@@ -67,42 +73,120 @@
         console.log("ERROR OCCURED");
     }
 
-    document.querySelector('#chat-message-submit').onclick = function(e){
-        const message_input = document.querySelector('#message_input');
-        const message = message_input.value;
-
-        socket.send(JSON.stringify({
-            'message':message,
-            'username' : username
-        }));
-
-        message_input.value = '';
-    }
-
-    socket.onmessage = function(e){
-        const data = JSON.parse(e.data);
-        document.querySelector('#chat-body').innerHTML += `<h1>${data.username} : ${data.message}<\h1><hr>`;
-        console.log(data.username)
-    }
-
-    function getKeys(){
-
-        function reqListener() {
-            privateKey = this.response;
-            console.log(privateKey)
+    function convertPemToBinary(pem) {
+        var lines = pem.split('\n')
+        var encoded = ''
+        for(var i = 0;i < lines.length;i++){
+            if (lines[i].trim().length > 0 &&
+                lines[i].indexOf('-BEGIN RSA PRIVATE KEY-') < 0 &&
+                lines[i].indexOf('-BEGIN RSA PUBLIC KEY-') < 0 &&
+                lines[i].indexOf('-END RSA PRIVATE KEY-') < 0 &&
+                lines[i].indexOf('-END RSA PUBLIC KEY-') < 0) {
+            encoded += lines[i].trim()
+            }
         }
-
-        const req = new XMLHttpRequest();
-        req.addEventListener("load", reqListener);
-        req.open("GET", "{% url 'api' %}");
-        req.setRequestHeader("User", username);//to get private key of the user
-        req.send();
-
+        return base64StringToArrayBuffer(encoded)
     }
-    
-    getKeys();
 
-    
+    function base64StringToArrayBuffer(b64str) {
+        var byteStr = atob(b64str)
+        var bytes = new Uint8Array(byteStr.length)
+        for (var i = 0; i < byteStr.length; i++) {
+            bytes[i] = byteStr.charCodeAt(i)
+        }
+        return bytes.buffer
+    }
+
+    function textToArrayBuffer(str) {
+        var buf = unescape(encodeURIComponent(str)) // 2 bytes for each char
+        var bufView = new Uint8Array(buf.length)
+        for (var i=0; i < buf.length; i++) {
+            bufView[i] = buf.charCodeAt(i)
+        }
+        return bufView
+    }
+
+    function arrayBufferToText(arrayBuffer) {
+        var byteArray = new Uint8Array(arrayBuffer)
+        var str = ''
+        for (var i=0; i<byteArray.byteLength; i++) {
+            str += String.fromCharCode(byteArray[i])
+        }
+        return str
+    }
+
+    fetch("{% url 'api' %}", options).then(response => response.json()).then(json => {
+
+        const algorithm = {
+            name: 'RSA-OAEP',
+            // specify the hash algorithm to use with the RSA key
+            hash: 'SHA-256',
+        };
+
+        // import the public key as an RSA-OAEP key
+        crypto.subtle.importKey(
+            'spki',
+            convertPemToBinary(json.publicKey),
+            algorithm,
+            false,
+            ['encrypt']
+        ).then(function(publicKey){
+            document.querySelector('#chat-message-submit').onclick = function(e){
+                const message_input = document.querySelector('#message_input');
+                const message = message_input.value;
+
+                crypto.subtle.encrypt(
+                    {
+                        name: 'RSA-OAEP',
+                    },
+                    publicKey,
+                    textToArrayBuffer(message)
+                ).then(function(ciphertext){
+                    
+                    console.log("Message chiffré : ", new Uint8Array(ciphertext).toString())
+                    socket.send(JSON.stringify({
+                        'message': new Uint8Array(ciphertext).toString(),
+                        'username' : username
+                    }));
+
+                    document.querySelector('#chat-body').innerHTML += `<h1>${username} : ${message}<\h1><hr>`;
+
+                    message_input.value = '';
+                })
+            }
+        })
+
+        // import the private key as an RSA-OAEP key
+        const privateKey = crypto.subtle.importKey(
+            'pkcs8',
+            convertPemToBinary(json.privateKey),
+            algorithm,
+            false,
+            ['decrypt']
+        ).then(function(privateKey){
+            socket.onmessage = function(e){
+                const data = JSON.parse(e.data);
+                if(data.username != username){
+                    const values = data.message.split(",");
+                    const numbers = values.map(value => parseInt(value, 10));
+                    const message = Uint8Array.from(numbers);
+                    console.log(message);
+                    crypto.subtle.decrypt(
+                        {
+                            name: "RSA-OAEP",
+                        },
+                        privateKey,
+                        message
+                    ).then(function(message){
+                        const uncrypted_message = arrayBufferToText(message)
+                        document.querySelector('#chat-body').innerHTML += `<h1>${data.username} : ${uncrypted_message}<\h1><hr>`;
+                    })
+                }
+            }
+        })
+
+    })
+
 </script>
 
 {% endblock %}

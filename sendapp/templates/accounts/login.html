@@ -7,14 +7,14 @@
     </head>
 
     <body>
-        <span class="sendapplogo">SendApp</span>
+        <span class="sendapplogo">SendApp.</span>
         <div class="login-container">
             <span class="error_msg">{{login_error}}</span>
             <form class="login-form" method="POST">
                 {% csrf_token %}
                 <input class="username" type="text" placeholder="Nom d'utilisateur" name="username" />
                 <input class="password" type="password" placeholder="Mot de passe" name="password" />
-                <button class="loginbtn">Connection</button>
+                <button class="loginbtn">Se connecter</button>
                 <span class="register">Pas encore membre ?</span>
                 <a class="registerbtn" href="{% url 'register' %}">S'enregistrer</a>
             </form>

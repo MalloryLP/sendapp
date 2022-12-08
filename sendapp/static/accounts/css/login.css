@@ -1,7 +1,7 @@
 body {
   background: rgb(0,4,40);
-  background: linear-gradient(32deg, rgba(0,4,40,1) 0%, rgba(0,78,146,1) 100%);
- }
+  background: linear-gradient(32deg, rgba(0,4,40,1) 0%, rgba(150,0,255,1) 100%);
+  }
  
 .login-container {
   width: 100%;
@@ -76,12 +76,7 @@ body {
   font-weight: 700;
 }
 
-input[type="text"]
-{
-    font-size:26px;
-}
-
-input[type="password"]
+input[type="text"], input[type="password"]
 {
     font-size:26px;
 }
