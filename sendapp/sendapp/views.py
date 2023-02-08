@@ -15,7 +15,14 @@ class Home(View):
 
     def get(self, request):
         users = User.objects.exclude(username=request.user.username)
-        return render(request, 'home/infos.html', context={'users': users})
+        return render(request, 'home/home.html', context={'users': users})
+
+    def post(self, request):
+        pass
+
+class Params(View):
+    def get(self, request):
+        return render(request, 'accounts/params.html',)
 
     def post(self, request):
         pass

@@ -1,6 +1,5 @@
 body {
-  background: rgb(0,4,40);
-  background: linear-gradient(32deg, rgba(0,4,40,1) 0%, rgba(150,0,255,1) 100%);
+  background: #212121;
   }
  
 .login-container {
@@ -17,45 +16,39 @@ body {
   width: 70vw;
   height: 17vh;
   position: relative;
-  background-color: rgb(255, 255, 255);
-  border-radius: 10px;
-  box-shadow: 3px 3px 10px 0px #000000;
 }
 .password {
-  top: 35%;
+  top: 4.5vh;
   left: 5%;
-  width: 89%;
+  width: 63vw;
   height: 3.5vh;
   position: absolute;
   border-radius: 5px;
   border-width: 1px;
 }
 .username {
-  top: 10%;
+  top: 0vh;
   left: 5%;
-  width: 89%;
+  width: 63vw;
   height: 3.5vh;
   position: absolute;
   border-radius: 5px;
   border-width: 1px;
 }
 .loginbtn {
-  top: 60%;
+  top: 9vh;
   left: 10%;
   width: 80%;
   height: 3.5vh;
   position: absolute;
   font-size: 40px;
   font-weight: bold;
-  background-color: rgb(21, 152, 0);
+  background-color: #25cb70;
   border-radius: 10px;
-}
-.loginbtn:hover{
-  background-color: #1ac704; 
 }
 .registerbtn {
   left: 40%;
-  top: 86%;
+  top: 80%;
   margin: auto;
   display: flex;
   position: absolute;
@@ -64,16 +57,18 @@ body {
   text-align: center;
   font-family: Roboto;
   font-weight: 700;
+  color: #ffffff;
 }
 .register {
   left: 5%;
-  top: 86%;
+  top: 80%;
   position: absolute;
   font-size: 25px;
   font-style: normal;
   text-align: center;
   font-family: Roboto;
   font-weight: 700;
+  color: #ffffff;
 }
 
 input[type="text"], input[type="password"]
@@ -92,6 +87,7 @@ input[type="text"], input[type="password"]
   text-align: center;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
+  color: #ffffff;
 }
 .enstalogo {
   left: 0px;

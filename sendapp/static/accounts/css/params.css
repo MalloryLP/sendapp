@@ -1,16 +1,6 @@
-.friendscontainer {
-    top: 10vh;
-    left: 0vw;
-    width: 100%;
-    height: 17vh;
-    overflow-y: scroll;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    background-color: #111;
-  }
+body {
+    background: #212121;
+}
 
 .infoscontainer {
     top: 2vh;
@@ -26,7 +16,7 @@
     flex-direction: column;
 }
 
-.message {
+.info {
     color: rgb(255, 255, 255);
     display: flex;
     position: absolute;
@@ -36,7 +26,3 @@
     font-weight: bold;
 }
 
-.friends {
-    color: #ffffff;
-    font-size: 5vw;
-}

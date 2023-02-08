@@ -1,25 +1,5 @@
 body {
-  background: rgb(35, 35, 35);
-}
-.navbar {
-  width: 15vw;
-  left: 2vw;
-  top: 2vh;
-  bottom: 2vh;
-  display: flex;
-  position: absolute;
-  max-width: auto;
-  min-width: auto;
-  align-self: flex-start;
-  max-height: auto;
-  min-height: auto;
-  align-items: flex-start;
-  border-style: double;
-  flex-direction: column;
-  justify-content: center;
-  background-color: rgb(103, 73, 238);
-  border-radius: 10px;
-  box-shadow: 3px 3px 10px 0px #000000;
+  background: #212121;
 }
 
 .messagescontainer {
@@ -39,51 +19,102 @@ body {
   box-shadow: 3px 3px 10px 0px #000000;
 }
 
-.profilicon {
-  top: 0vh;
+.info-container {
+  width: 100%;
   display: flex;
-  position: absolute;
-}
-
-.chaticon {
-  top: 30vh;
-  display: flex;
-  position: absolute;
-}
-
-.calendaricon {
-  top: 40vh;
-  display: flex;
-  position: absolute;
-}
-
-.mailicon {
-  top: 50vh;
-  display: flex;
-  position: absolute;
-}
-
-.homeicon {
-  top: 90%;
-  display: flex;
-  position: absolute;
-}
-
-.logoutbtn {
-  top: 150px;
-  left: 2vw;
-  width: 11vw;
-  height: 2vh;
-  display: flex;
-  position: absolute;
-  text-align: center;
+  overflow: auto;
+  min-height: 100vh;
   align-items: center;
+  border-color: var(--dl-color-gray-black);
+  border-width: 1px;
+  flex-direction: column;
   justify-content: center;
-  text-decoration: none;
-  background-color: rgb(201, 0, 0);
+  background-color: #212121;
+}
+.welcome-msg {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.bvn {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 72px;
+  text-align: center;
+  margin-bottom: 2%;
+}
+.inv {
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 32px;
+  text-align: center;
+}
+.btn-container {
+  flex: 0 0 auto;
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.connect {
+  color: #ffffff;
+  width: 25vw;
+  height: 4vh;
+  margin: 5%;
+  font-size: 24px;
+  text-align: center;
+  background-color: #25cb70;
+  border-radius: 10px;
+}
+.create {
+  color: #ffffff;
+  width: 25vw;
+  height: 4vh;
+  margin: 5%;
+  font-size: 24px;
+  text-align: center;
+  background-color: #25cb70;
   border-radius: 10px;
 }
 
-.logoutbtn:hover{
-  background-color: #ff0000; 
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  padding-top: 8vh;
+  transition: all 0.1s;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 5vw;
+  color: #818181;
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 15vw;
+  margin-left: 50px;
+}
+
+.openbtn {
+  top: 0;
+  position: relative;
+  font-size: 15vw;
+  color: #ffffff;
 }

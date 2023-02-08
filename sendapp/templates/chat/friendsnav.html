@@ -18,11 +18,9 @@
 
 <div class="friendscontainer">
 
-    <h1>Amis :</h1>
-
     {% for user in users %}
     <tr>
-        <td><a href="{% url 'friendchat' username=user.username%}">{{user.username}}</a></td>
+        <td><a class="friends" href="{% url 'friendchat' username=user.username%}">{{user.username}}</a></td>
     </tr>
     {% endfor %}
     

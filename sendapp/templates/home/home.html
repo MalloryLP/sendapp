@@ -11,7 +11,7 @@
 
     {% if user.is_authenticated %}
 
-    <div class="navbar">
+    <!-- <div class="navbar">
         <svg viewBox="0 0 1024 1024" class="profilicon">
           <path
             d="M576 706.612v-52.78c70.498-39.728 128-138.772 128-237.832 0-159.058 0-288-192-288s-192 128.942-192 288c0 99.060 57.502 198.104 128 237.832v52.78c-217.102 17.748-384 124.42-384 253.388h896c0-128.968-166.898-235.64-384-253.388z"
@@ -42,24 +42,50 @@
                 ></path>
             </svg>
         </a>
+    </div> -->
+
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="{% url 'chat' %}">Messagerie</a>
+        <p>_</p>
+        <p>_</p>
+        <a href="{% url 'params' %}">Paramètres</a>
+        <p>_</p>
+        <p>_</p>
+        <a href="{% url 'logout' %}">Se déconnecter</a>
     </div>
+
+    <span class="openbtn" onclick="openNav()">&#9776;</span>
+
 
     {% block infos %}{% endblock %}
     
-    {% block chat %}{% endblock %} -->
+    {% block chat %}{% endblock %}
 
-    <!-- <div class="messagescontainer">
-        {% block messages %}{% endblock %}
-    </div> -->
+    {% block params %}{% endblock %}
 
     {% block javascript %} {% endblock %}
 
     {% else %}
 
-    <div class="alert alert-success" role="alert">
-        <h3>Bienvenue, vous n'êtes pas connecté !</h3>
-        <a href="{% url 'register' %}">Signup</a>
-        <a href="{% url 'login' %}">Login</a>
+    <div class="info-container">
+        <div class="welcome-msg">
+            <span class="bvn">Bienvenue sur SendApp.</span>
+            <span class="inv">
+                Connectez-vous ou créez un compte pour continuer.
+            </span>
+            <div class="btn-container">
+                <form action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <input type="submit" value="S'enregistrer" class="create button">
+                </form>
+
+                <form action="{% url 'login' %}">
+                    {% csrf_token %}
+                    <input type="submit" value="Se connecter" class="connect button">
+                </form>
+            </div>
+        </div>
     </div>
 
     {% endif %}
@@ -67,3 +93,12 @@
     </body>
 </html>
 
+<script>
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "50vw";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+</script>

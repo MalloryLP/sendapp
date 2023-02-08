@@ -1,6 +1,5 @@
 body {
-    background: rgb(0,4,40);
-    background: linear-gradient(32deg, rgba(0,4,40,1) 0%, rgba(150,0,255,1) 100%);
+    background: #212121;
 }
 
 .register-container {
@@ -18,9 +17,6 @@ body {
     width: 70vw;
     height: 38vh;
     position: relative;
-    background-color: rgb(255, 255, 255);
-    border-radius: 10px;
-    box-shadow: 3px 3px 10px 0px #000000;
   }
 
 .registerlogo {
@@ -34,6 +30,7 @@ body {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
+    color: #ffffff;
   }
 
 .input-form{
@@ -47,20 +44,20 @@ body {
 }
 
 .registerbtn {
-    top: 31vh;
+    top: 31.3vh;
     left: 10%;
     width: 80%;
     height: 3.5vh;
     position: absolute;
     font-size: 40px;
     font-weight: bold;
-    background-color: rgb(21, 152, 0);
+    background-color: #25cb70;
     border-radius: 10px;
   }
 
 .loginbtn {
     left: 30%;
-    top: 35vh;
+    top: 36vh;
     margin: auto;
     display: flex;
     position: absolute;
@@ -69,16 +66,18 @@ body {
     text-align: center;
     font-family: Roboto;
     font-weight: 700;
+    color: #ffffff;
   }
 .login {
     left: 5%;
-    top: 35vh;
+    top: 36vh;
     position: absolute;
     font-size: 25px;
     font-style: normal;
     text-align: center;
     font-family: Roboto;
     font-weight: 700;
+    color: #ffffff;
   }
 
 input[type="text"], input[type="password"]{

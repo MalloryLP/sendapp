@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from sendapp.views import Home
+from sendapp.views import Home, Params
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', Home.as_view(), name='home'),
+    path('params/', Params.as_view(), name='params'),
     path('', include('accounts.urls')),
     path('', include('chat.urls')),
 ]
