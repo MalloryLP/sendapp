@@ -26,7 +26,7 @@
 
 </div>
 
-<div class="info" style="top: 29vh;color: rgb(255, 255, 255);font-size: 40px;font-family: Arial, Helvetica, sans-serif;font-weight: bold;">Conversation avec {{username}}</div>
+<div class="info" style="top: 29vh;color: rgb(255, 255, 255);font-size: 40px;font-family: Arial, Helvetica, sans-serif;font-weight: bold;">Conversation avec {{friend}}</div>
 <div class="info" style="top: 32vh;color: rgb(255, 255, 255);font-size: 30px;" id="connection_status">En attente de connection...</div>
 
 <div class="chatcontainer">
@@ -46,13 +46,15 @@
 <script>
 
     const username = '{{user.username}}';
-    const id = '{{requested_user_id}}';
+    const friend = '{{friend}}'
+    const friend_id = '{{requested_user_id}}';
+    const previous_msgs = {{ messages|safe }};   
 
     const socket = new WebSocket(
         'wss://'
         + '192.168.1.124:8001'
         + '/ws/'
-        + id
+        + friend_id
         + '/'
     );
 
@@ -124,7 +126,6 @@
     }
 
     fetch("{% url 'api' %}", options).then(response => response.json()).then(json => {
-
         const algorithm = {
             name: 'RSA-OAEP',
             // specify the hash algorithm to use with the RSA key
@@ -134,11 +135,11 @@
         // import the public key as an RSA-OAEP key
         crypto.subtle.importKey(
             'spki',
-            convertPemToBinary(json.publicKey),
+            convertPemToBinary(json.user.UserPublicKey),
             algorithm,
             false,
             ['encrypt']
-        ).then(function(publicKey){
+        ).then(function(userpublicKey){
 
             document.querySelector('#chat-message-submit').onclick = function(e){
                 const message_input = document.querySelector('#message_input');
@@ -148,7 +149,7 @@
                     {
                         name: 'RSA-OAEP',
                     },
-                    publicKey,
+                    userpublicKey,
                     textToArrayBuffer(message)
                 ).then(function(ciphertext){
                     //console.log("Message chiffré à envoyer : ", new Uint8Array(ciphertext).toString())
@@ -207,26 +208,67 @@
         })
 
         // import the private key as an RSA-OAEP key
-        const privateKey = crypto.subtle.importKey(
+        crypto.subtle.importKey(
             'pkcs8',
-            convertPemToBinary(json.privateKey),
+            convertPemToBinary(json.friend.FriendPrivateKey),
             algorithm,
             false,
             ['decrypt']
-        ).then(function(privateKey){
-            socket.onmessage = function(e){
-                const data = JSON.parse(e.data);
-                if(data.username != username){
+        ).then(function(friendprivateKey){
 
-                    if(data.type == "text"){
-                        const values = data.message.split(",");
-                        const numbers = values.map(value => parseInt(value, 10));
-                        const message = Uint8Array.from(numbers);
+            crypto.subtle.importKey(
+                'pkcs8',
+                convertPemToBinary(json.user.UserPrivateKey),
+                algorithm,
+                false,
+                ['decrypt']
+            ).then(function(userprivateKey){
+                for(let i = 0; i < previous_msgs.length; i++){
+                    const values = previous_msgs[i][1].split(",");
+                    const numbers = values.map(value => parseInt(value, 10));
+                    const message = Uint8Array.from(numbers);
+                    if(previous_msgs[i][0] == username){
                         crypto.subtle.decrypt(
                             {
                                 name: "RSA-OAEP",
                             },
-                            privateKey,
+                            userprivateKey,
+                            message
+                        ).then(function(message){
+                            const uncrypted_message = arrayBufferToText(message)
+                            //document.querySelector('#user-body').innerHTML += `${username} :`;
+                            document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #898989;margin:10px;">${username} : ${uncrypted_message}<\div>`;
+                        })
+                    }else{
+                        crypto.subtle.decrypt(
+                            {
+                                name: "RSA-OAEP",
+                            },
+                            friendprivateKey,
+                            message
+                        ).then(function(message){
+                            const uncrypted_message = arrayBufferToText(message)
+                            //document.querySelector('#user-body').innerHTML += `${username} :`;
+                            document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #898989;margin:10px;">${friend} : ${uncrypted_message}<\div>`;
+                        })
+                    }
+                }
+            })
+
+            socket.onmessage = function(e){
+                const data = JSON.parse(e.data);
+                if(data.username != username){
+
+                    const values = data.message.split(",");
+                    const numbers = values.map(value => parseInt(value, 10));
+                    const message = Uint8Array.from(numbers);
+
+                    if(data.type == "text"){
+                        crypto.subtle.decrypt(
+                            {
+                                name: "RSA-OAEP",
+                            },
+                            friendprivateKey,
                             message
                         ).then(function(message){
                             const uncrypted_message = arrayBufferToText(message)
@@ -234,11 +276,6 @@
                             document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #b6b6b6;margin:10px;">${data.username} : ${uncrypted_message}<\div>`;
                         })
                     }else{
-                        const values = data.message.split(",");
-                        const numbers = values.map(value => parseInt(value, 10));
-                        const message = Uint8Array.from(numbers);
-
-                        console.log(message);
 
                         var blob = new Blob([message], {type: "image/jpeg"});
                         var imageURL = URL.createObjectURL(blob);
@@ -253,39 +290,6 @@
         })
 
     })
-
-    /*image_input.addEventListener("change", function() {
-        if(image_input.files.length > 0){
-            var file = image_input.files[0];
-
-            console.log(file)
-
-            var reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            reader.onloadend = function() {
-                var arrayBuffer = reader.result;
-                var data = new Uint32Array(arrayBuffer);
-
-                console.log(data)
-
-                var blob = new Blob([data], {type: "image/jpeg"});
-                var imageURL = URL.createObjectURL(blob);
-                var image_output = document.createElement("img");
-                image_output.src = imageURL;
-                image_output.width = 200;
-                image_output.height = 200;
-
-                document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #838383;margin:10px;">${username} : <\div>`;
-                document.getElementById("chat-body").appendChild(image_output);
-
-            };
-        }else{
-            console.log("No file selected.");
-        }
-
-        image_input.value = "";
-
-    });*/
 
 </script>
 

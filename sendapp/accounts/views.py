@@ -66,13 +66,29 @@ class EncryptionKey(View):
         return False
 
     def get(self, request):
-        if PublicKey.objects.filter(owner=request.headers["Referer"].split("/")[-2]).exists():
-            obj1 = PublicKey.objects.get(owner = request.headers["Referer"].split("/")[-2])
 
-            if PrivateKey.objects.filter(owner=request.headers["User"]).exists():
-                obj2 = PrivateKey.objects.get(owner = request.headers["User"])
+        print(request.headers["User"])
 
-                return JsonResponse({'publicKey': obj1.pub, 'privateKey': obj2.pri})
+        if PublicKey.objects.filter(owner=request.headers["User"]).exists():
+                obj1 = PublicKey.objects.get(owner = request.headers["User"])
+                if PrivateKey.objects.filter(owner=request.headers["User"]).exists():
+                    obj2 = PrivateKey.objects.get(owner = request.headers["User"])
+                    if PublicKey.objects.filter(owner=request.headers["Referer"].split("/")[-2]).exists():
+                        obj3 = PublicKey.objects.get(owner = request.headers["Referer"].split("/")[-2])
+                        if PrivateKey.objects.filter(owner=request.headers["Referer"].split("/")[-2]).exists():
+                            obj4 = PrivateKey.objects.get(owner = request.headers["Referer"].split("/")[-2])
+
+                            return JsonResponse(
+                                {"user": {
+                                    "name": obj1.owner,
+                                    "UserPublicKey": obj1.pub,
+                                    "UserPrivateKey": obj2.pri
+                                }, "friend": {
+                                    "name": obj3.owner,
+                                    "FriendPublicKey": obj3.pub,
+                                    "FriendPrivateKey": obj4.pri
+                                }})
+                                
         return JsonResponse({'publicKey': None, 'privateKey': None})
 
     def post(self, request):

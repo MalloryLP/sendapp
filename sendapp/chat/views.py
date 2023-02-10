@@ -27,26 +27,26 @@ class Home(View):
 class Chat(View):
 
     def get(self, request, username):
-        session_user_id = request.user.id
-        requested_user_id = User.objects.get(username=username).id
+        user_id = request.user.id
+        friend_id = User.objects.get(username=username).id
 
-        if session_user_id > requested_user_id:
-            thread_name = f'chat_{session_user_id}-{requested_user_id}'
+        if user_id > friend_id:
+            thread_name = f'chat_{user_id}-{friend_id}'
         else:
-            thread_name = f'chat_{requested_user_id}-{session_user_id}'
-
-        print(thread_name)
+            thread_name = f'chat_{friend_id}-{user_id}'
 
         message_objs = ChatModel.objects.filter(thread_name=thread_name)
+
         senders = {}
         send_messg = []
         for i, mesg in enumerate(message_objs):
             user_obj_temp = User.objects.get(id=mesg.sender)
             senders[user_obj_temp.id] = f"{user_obj_temp.username}"
-            send_messg.append([f"{mesg.sender}", f"{mesg.message}", mesg.timestamp])
+            #send_messg.append([f"{mesg.sender}", f"{mesg.message}", mesg.timestamp])
+            send_messg.append([f"{senders[user_obj_temp.id]}", f"{mesg.message}"])        
 
         users = User.objects.exclude(username=request.user.username)
-        return render(request, 'chat/chat.html', context={'requested_user_id' : f"{requested_user_id}" ,'users': users, 'messages' : send_messg, 'username' : username, 'count' : len(send_messg)})
+        return render(request, 'chat/chat.html', context={'requested_user_id' : f"{friend_id}" ,'users': users, 'messages' : send_messg, 'friend' : username, 'count' : len(send_messg)})
 
 
     def post(self, request):

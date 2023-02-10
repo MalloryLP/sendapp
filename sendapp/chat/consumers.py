@@ -5,6 +5,7 @@ from channels.db import database_sync_to_async
 from .models import ChatModel
 from django.contrib.auth.models import User
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
 
 class PersonalChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -43,7 +44,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         username = data['username']
 
         if type == "text":
-            #await self.save_message(username, self.room_group_name, message)
+            await self.save_message(username, self.room_group_name, message)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -85,3 +86,8 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             'message': message,
             'username': username
         }))
+
+    @database_sync_to_async
+    def save_message(self, username, thread_name, message):
+        user_id = self.scope['user'].id
+        ChatModel.objects.create(sender=user_id, message=message, thread_name=thread_name)
