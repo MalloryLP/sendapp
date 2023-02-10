@@ -33,27 +33,55 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data=None, bytes_data=None):
-        print("WEBSOCKET RECEIVE")
+        print("Daphne - message received")
         data = json.loads(text_data)
+
+        print(data)
+
+        type = data['type']
         message = data['message']
         username = data['username']
 
-        #await self.save_message(username, self.room_group_name, message)
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'username': username,
-            }
-        )
+        if type == "text":
+            #await self.save_message(username, self.room_group_name, message)
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'username': username,
+                }
+            )
+        elif type == "image":
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_image',
+                    'message': message,
+                    'username': username,
+                }
+            )
 
     async def chat_message(self, event):
-        print("WEBSOCKET SEND")
         message = event['message']
         username = event['username']
 
+        print("Daphne - " + username + " - message send using chat_message")
+
         await self.send(text_data=json.dumps({
+            'type': 'text',
+            'message': message,
+            'username': username
+        }))
+
+    async def chat_image(self, event):
+        message = event['message']
+        username = event['username']
+
+        print("Daphne - " + username + " - message send using chat_image")
+
+        await self.send(text_data=json.dumps({
+            'type': 'image',
             'message': message,
             'username': username
         }))
