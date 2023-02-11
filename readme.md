@@ -1,6 +1,6 @@
 > [Mallory Lehuault-Parc](https://https://github.com/MalloryLP) - FIPA SE 2023
 
-# Introduction
+## Introduction
 
 SendApp est un application de messagerie instantannée qui permet d'entretenir des conversations chiffrées de bout en bout entre tous les utilisateurs.  
 
@@ -10,7 +10,7 @@ Le projet se base sur [Django](https://www.djangoproject.com/) qui est un framew
 
 Vous pourrez retrouver dans le répertoire [doc](https://github.com/MalloryLP/sendapp/tree/main/doc) toutes les informations et les recherches liées à ce projet. Dans le répertoire [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp) se trouve les codes le faisant fonctionner. 
 
-# Installation
+## Installation
 
 Copie des fichiers sources depuis Github :
 ```
@@ -30,7 +30,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-# Lancement
+## Lancement
 
 Sur windows dans deux shells distincs :
 ```powershell
