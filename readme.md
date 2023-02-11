@@ -1,4 +1,4 @@
-> [Mallory Lehuault-Parc](https://https://github.com/MalloryLP) - FIPA SE 2023
+> [Mallory Lehuault-Parc](https://github.com/MalloryLP) - FIPA SE 2023
 
 # Introduction
 
