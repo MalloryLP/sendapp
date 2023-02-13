@@ -16,11 +16,11 @@ Comme cités dans la partie précédente, on en retrouve plusieurs tels que :
 
 Parmi ces derniers, j'ai eu plusieurs expériences avec Flask, Node.js et une avec Django. Ils ont tous leurs avantages et inconvénients. Mon choix va se porter sur Django car j'avais été très satisfait lors de ma première expérience sur un projet minimaliste en entreprise. Ce projet me permet d'aller plus loin dans le fonctionnement de ce framework.  
 
-Django est framework web haut niveau en python (version minimum : 2.7) dont le développement a débuté en 2003. Ce framework est libre d'utilisation. Il permet de créer des serveurs web léger. Autour de Django s’est construit une communauté très active, avec au moins deux conférences par an (DjangoCon). La documentation est très bien détaillée. Une nouvelle version du framework sort tous les 8 mois environ.
+Django est framework web haut niveau en python dont le développement a débuté en 2003. Ce framework est libre d'utilisation. Il permet de créer des serveurs web léger. Autour de Django s’est construit une communauté très active, avec au moins deux conférences par an (DjangoCon). La documentation est très bien détaillée. Une nouvelle version du framework sort tous les 8 mois environ.
 
 <img src="images/maj.png" width="500">
 
-Quels sont ses avantages et inconvénients pour un tel projet ?
+Après plusieurs recherches sur internet et l'avis d'une connaissance, j'ai pu dresser des tableaux de ses avantages et inconvénients :
 
 | Avantages | Commentaires | 
 |-----------|--------------|
