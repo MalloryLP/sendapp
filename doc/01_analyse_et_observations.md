@@ -17,7 +17,8 @@ On imagine facilement que le projet nécessite d'un serveur web ou d'une api, ce
 ## Quelques projets déjà existants
 
 Dans un premier temps, il s'agissait d'aller voir ce qu'il se faisait déjà sur internet. On retrouve plusieurs projets qui proposent des messageries instantannées assez évoluées basées sur des infrastructures différentes. Ayant choisi de developper une solution basée sur un serveur web, je me suis renseigné sur les différents types de framework web. Un framework web est un ensemble de bibliothèques, de composants et de guidelines qui aident les développeurs à créer des applications web de manière plus efficace et plus rapide dans plusieurs langages. Il en existe de nombreux, open source ou non.  
-J'ai choisi de privilégier un framework web open source car :
+
+J'ai choisi de privilégier un framework web libre d'utilisation car :
 - ils sont gratuit en général.
 - ils sont plus fléxible que des solutions payantes. Cela semble indispensable si je veux pouvoir implémenter une solution de chiffrement.
 - ils ont très souvent une communauté qui soutient le projet. Je pourrais trouver de l'aide facilement en cas de problème (même chose pour les solutions propriétaires).  
