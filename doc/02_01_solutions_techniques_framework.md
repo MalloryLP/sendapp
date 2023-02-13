@@ -37,9 +37,23 @@ Après plusieurs recherches sur internet et l'avis d'une connaissance, j'ai pu d
 
 ## Mise en place du projet
 
-La structure de code à l’avantage d’être claire, les applications utilisées par le serveur sont isolées dans leurs répertoires correspondants. Ci-dessous le répertoire du serveur [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp), dans lequel on retrouve les codes relatifs à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), aux [chats](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat), les [paramètres sur serveur](https://github.com/MalloryLP/sendapp/tree/main/sendapp/sendapp) et les répertoires liés au front-end, [static](https://github.com/MalloryLP/sendapp/tree/main/sendapp/static) et [template](https://github.com/MalloryLP/sendapp/tree/main/sendapp/templates). Le serveur est livré avec une base de données relationnelles sqlite3.
+La structure de code à l’avantage d’être claire, les applications (fonctionnalités) utilisées par le serveur sont isolées dans leurs répertoires correspondants. C'est au developpeur d'imaginer la structure. Ci-dessous le répertoire du serveur [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp), dans lequel on retrouve les codes relatifs à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), aux [chats](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat), les [paramètres sur serveur](https://github.com/MalloryLP/sendapp/tree/main/sendapp/sendapp) et les répertoires liés au front-end, [static](https://github.com/MalloryLP/sendapp/tree/main/sendapp/static) et [template](https://github.com/MalloryLP/sendapp/tree/main/sendapp/templates). Le serveur est livré avec une base de données relationnelles sqlite3.
 
 <img src="images/root.jpg" width="600">  
+
+Si on regarde de plus près dans le répertoire lié à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), on retrouve plusieurs programmes :
+
+<img src="images/contenu.png" width="600">  
+
+Dans un projet Django, chaque application a généralement ces fichiers. On retrouve la même structure de code dans le répertoire [chat](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat) :
+
+- models.py : Y sont définies les classes de modèles Django qui représentent les tables de la base de données.
+- forms.py : C'est le fichier où les formulaires sont définis, utilisés pour saisir et valider les données en vue de les enregistrer dans la base de données.
+- views.py : C'est le fichier où les vues sont définies, qui sont les fonctions ou les classes qui gèrent les requêtes HTTP et renvoient les réponses HTTP. C'est la partie la plus importante.
+- urls.py : Il gère les URL de l'application, associant les URL aux vues.
+- test.py : On y retrouve les programmes pour des tests.
+- admin.py : Utilisé pour faire le lien avec l'interface administrateur de Django.
+- apps.py : Sert à modifier des paramètres liés à l'application.
 
 J'ai voulu quelque chose de simple pour l'application avec une page d'accueil, de connexion, de création de compte et le chat. Le diagramme fonctionnel ce-dessous représente la structure du site :
 
