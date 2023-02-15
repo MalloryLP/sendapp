@@ -15,10 +15,8 @@ class Register(View):
 
     def get(self, request):
         form = CustomUserRegisterForm()
-        context = {
-            'form': form
-        }
-        return render(request, 'accounts/register.html', context=context)
+
+        return render(request, 'accounts/register.html', context={'form': form})
 
     def post(self, request):
         form = CustomUserRegisterForm(request.POST)
@@ -56,6 +54,9 @@ class Login(View):
 class KeyGen(View):
     def get(self, request):
         return render(request, 'accounts/key_gen.html')
+    
+    def post(self, request):
+        pass
 
 class EncryptionKey(View):
 

@@ -20,7 +20,7 @@ Django est framework web haut niveau en python dont le développement a débuté
 
 <img src="images/maj.png" width="500">
 
-Après plusieurs recherches sur internet et l'avis d'une connaissance, j'ai pu dresser des tableaux de ses avantages et inconvénients :
+Après plusieurs recherches sur internet et l'avis d'une connaissance, j'ai pu dresser des tableaux de ses avantages et inconvénients.
 
 | Avantages | Commentaires | 
 |-----------|--------------|
@@ -33,7 +33,9 @@ Après plusieurs recherches sur internet et l'avis d'une connaissance, j'ai pu d
 |-----------|--------------|
 | Surdimensionné pour les petits projets | Django est utilisé par Facebook, Instagram ... |
 | Lent si on ne respecte pas la structure de programmation | Il faut veiller à bien comprendre la méthodologie expliqué dans la documentation |
-| Pas simple d'utilisation au départ | Nécéssite de lire la documentation |
+| Pas simple d'utilisation au départ | Nécéssite de lire la documentation |  
+
+Je pense donc que Django est vraiment adapté pour ce type de projet.
 
 ## Mise en place du projet
 
@@ -50,18 +52,21 @@ Dans un projet Django, chaque application a généralement ces fichiers. On retr
 - models.py : Y sont définies les classes de modèles Django qui représentent les tables de la base de données.
 - forms.py : C'est le fichier où les formulaires sont définis, utilisés pour saisir et valider les données en vue de les enregistrer dans la base de données.
 - views.py : C'est le fichier où les vues sont définies, qui sont les fonctions ou les classes qui gèrent les requêtes HTTP et renvoient les réponses HTTP. C'est la partie la plus importante.
-- urls.py : Il gère les URL de l'application, associant les URL aux vues.
+- urls.py : Il gère les urls de l'application, associant les URL aux vues.
 - test.py : On y retrouve les programmes pour des tests.
 - admin.py : Utilisé pour faire le lien avec l'interface administrateur de Django.
 - apps.py : Sert à modifier des paramètres liés à l'application.
 
-J'ai voulu quelque chose de simple pour l'application avec une page d'accueil, de connexion, de création de compte et le chat. Le diagramme fonctionnel ce-dessous représente la structure du site :
+J'ai voulu quelque chose de simple pour l'application avec une page d'accueil, de connexion, de création de compte et le chat. Le diagramme fonctionnel ci-dessous représente la structure du site :
 
 <img src="images/structure.jpg" width="600">
 
 L'utilisateur demande à accéder à la page principale. Il n'est pas connecté. S'offre à lui deux choix : se connecter ou s'enregistrer. Une fois qu'il aura complété le formulaire, il sera connecté et redirigé vers la page /home. Celle-ci propose plusieurs options comme : se déconnecter, aller dans les paramètres du compte utilisateur et accéder à la messagerie.  
 En parallèle, l'administrateur du site peut demander la page /admin pour administer le site et sa base de données. Cette interface est implémenté directement à la création du serveur et peut être modifiée. 
 
+La description des urls auquels l'utilisateur à accès sont disponibles dans les fichiers urls.py de chaque répertoire d'application correspondant. A ces urls sont associés des classes traités comme des vues. Ces classes gèrent les requettes HTTP GET et POST.
+
+Description des urls gérés par l'application relative à la gestion des comptes :
 ```python
 urlpatterns = [
     path('register/', views.Register.as_view(), name='register'),
@@ -72,13 +77,14 @@ urlpatterns = [
 ]
 ```
 
+Description des urls gérés par l'application chat :
 ```python
 urlpatterns = [
     path('chat/', views.Home.as_view(), name='chat'),
     path('chat/<str:username>/', views.Chat.as_view(), name='friendchat')
 ]
 ```
-
+Description des urls gérés par le serveur en lui même :
 ```python
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -88,3 +94,36 @@ urlpatterns = [
     path('', include('chat.urls')),
 ]
 ```
+
+Par exemple, on peut analyser les codes impliqués la création de compte d'un utilisateur. D'après le diagramme fonctionnel, il faut aller à la page /register.
+
+```python
+path('register/', views.Register.as_view(), name='register'),
+```
+
+La classe Register() est traitée comme une vue. Django permet de nommer les urls liés au classes pour pouvoir directement les appeler dans d'autre parties du code.
+
+Ci-dessous la classe `Register` qui hérite de la classe `View`, avec les méthodes `get` et `post` qui ont étés surchargées.
+
+```python
+class Register(View):
+
+    def get(self, request):
+        form = CustomUserRegisterForm()
+
+        return render(request, 'accounts/register.html', context={'form': form})
+
+    def post(self, request):
+        form = CustomUserRegisterForm(request.POST)
+
+        if form.is_valid():
+            new_user = form.save()
+            new_user = authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'],
+                                    )
+            login(request, new_user)
+
+            return redirect('gen')
+```
+
+Quand le navigateur fait la requête GET sur `/register`, la méthode `get` permet de retourner le formulaire d'inscription avec la méthode `render`, qui retourne la page HTML et le contexte. Le contexte est un dictionnaire pour passer informations au HTML tel que des variables ou des formulaires ici. Le formulaire d'inscription est aussi une classe, on verra son implémentation par la suite. Quand l'utilisateur veut envoyer des informations vers le serveur (données du formulaire), c'est la méthode `post` qui va être utilisé. On récupère les informations de la requêtes au travers de `request`, on traite les données et le navigateur est redirigé vers la page `gen` avec la méthode `redirect`. Le nom d'url `gen` est associé à la classe `KeyGen` comme vu plus haut.
