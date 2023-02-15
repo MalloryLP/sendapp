@@ -18,7 +18,9 @@ Parmi ces derniers, j'ai eu plusieurs expériences avec Flask, Node.js et une av
 
 Django est framework web haut niveau en python dont le développement a débuté en 2003. Ce framework est libre d'utilisation. Il permet de créer des serveurs web léger. Autour de Django s’est construit une communauté très active, avec au moins deux conférences par an (DjangoCon). La documentation est très bien détaillée. Une nouvelle version du framework sort tous les 8 mois environ.
 
-<img src="images/maj.png" width="500">
+<p align="center" width="100%">
+    <img src="images/maj.png" width="70%">  
+</p>
 
 Après plusieurs recherches sur internet et l'avis d'une connaissance, j'ai pu dresser des tableaux de ses avantages et inconvénients.
 
@@ -43,11 +45,16 @@ Je pense donc que Django est vraiment adapté pour ce type de projet.
 
 La structure de code à l’avantage d’être claire, les applications (fonctionnalités) utilisées par le serveur sont isolées dans leurs répertoires correspondants. C'est au developpeur d'imaginer la structure. Ci-dessous le répertoire du serveur [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp), dans lequel on retrouve les codes relatifs à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), aux [chats](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat), les [paramètres sur serveur](https://github.com/MalloryLP/sendapp/tree/main/sendapp/sendapp) et les répertoires liés au front-end, [static](https://github.com/MalloryLP/sendapp/tree/main/sendapp/static) et [template](https://github.com/MalloryLP/sendapp/tree/main/sendapp/templates). Le serveur est livré avec une base de données relationnelles sqlite3.
 
-<img src="images/root.jpg" width="600">  
+
+<p align="center" width="100%">
+    <img src="images/root.jpg" width="70%">  
+</p>
 
 Si on regarde de plus près dans le répertoire lié à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), on retrouve plusieurs programmes :
 
-<img src="images/contenu.png" width="600">  
+<p align="center" width="100%">
+    <img src="images/contenu.png" width="70%"> 
+</p> 
 
 Dans un projet Django, chaque application a généralement ces fichiers. On retrouve la même structure de code dans le répertoire [chat](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat) :
 
@@ -61,7 +68,10 @@ Dans un projet Django, chaque application a généralement ces fichiers. On retr
 
 J'ai voulu quelque chose de simple pour l'application avec une page d'accueil, de connexion, de création de compte et le chat. Le diagramme fonctionnel ci-dessous représente la structure du site :
 
-<img src="images/structure.jpg" width="600">
+<p align="center" width="100%">
+    <img src="images/structure.jpg" width="70%">
+</p>
+
 
 L'utilisateur demande à accéder à la page principale. Il n'est pas connecté. S'offre à lui deux choix : se connecter ou s'enregistrer. Une fois qu'il aura complété le formulaire, il sera connecté et redirigé vers la page `/home`. Celle-ci propose plusieurs options comme : se déconnecter, aller dans les paramètres du compte utilisateur et accéder à la messagerie.  
 En parallèle, l'administrateur du site peut demander la page `/admin` pour administer le site et sa base de données. Cette interface est implémenté directement à la création du serveur et peut être modifiée. 
@@ -105,7 +115,7 @@ Par exemple, on peut analyser les codes impliqués la création de compte d'un u
 path('register/', views.Register.as_view(), name='register'),
 ```
 
-La classe `Register` est traitée comme une vue. Django permet de nommer les urls liés au classes pour pouvoir directement les appeler dans d'autre parties du code.
+La classe `Register` est traitée comme une vue. Django permet de nommer les urls liés aux classes pour pouvoir directement les appeler dans d'autre parties du code.
 
 Ci-dessous la classe `Register` qui hérite de la classe `View`, avec les méthodes `get` et `post` qui ont étés surchargées.
 
@@ -134,6 +144,18 @@ Quand le navigateur fait la requête GET sur `/register`, la méthode `get` perm
 
 ### Le modèle de création du compte
 
+Comme pour toutes messageries intantannées, il faut pouvoir créer son compte. Ci-dessous le formulaire d'inscription. Des informations basiques y sont demandés.
+
+<p align="center" width="100%">
+    <img src="images/register.png" width="50%"> 
+</p>
+
+Le formulaire est basé sur la classe `CustomUserRegisterForm` qui hérite de la classe `UserCreationForm`. Là est la force de ce framework, le backend est lié au frontend par l'intermédiaire de classes, ce qui permet de developper des codes clairs et lisibles, sans ambiguités.
+
+Le formulaire inclut six champs, chacun avec un libellé et un widget personnalisé qui ajoute des attributs de style à chaque champ. Les six champs sont `username`, `email`, `first_name`, `last_name`, `password1`, et `password2`.
+
+Le formulaire utilise la méthode `save()` pour enregistrer l'utilisateur dans la base de données, en appelant la méthode `create_user()` de Django. La valeur de `commit` est définie par défaut sur True, ce qui signifie que l'utilisateur sera enregistré immédiatement en appelant la méthode `save()`.
+
 ```python
 class CustomUserRegisterForm(UserCreationForm):  
     username = forms.CharField(label='Username', min_length=5, max_length=150, widget=forms.TextInput(attrs={   'class': "input-form", 'placeholder': 'Pseudonyme', 'style': "--top_level: 1vh;"}))  
@@ -154,6 +176,8 @@ class CustomUserRegisterForm(UserCreationForm):
         return user  
 ```
 
+Une fois que la classe correspondant au modèle du formulaire d'inscription est crée, il n'y a plus qu'à l'instancier dans la vue `Register`. Quand un navigateur fait une requête GET, on comprend mieux le `form = CustomUserRegisterForm()` et le fait qu'il soit retourné par la méthode avec la page `accounts/register.html`. 
+
 ```python
 class Register(View):
 
@@ -162,18 +186,11 @@ class Register(View):
 
         return render(request, 'accounts/register.html', context={'form': form})
 
-    def post(self, request):
-        form = CustomUserRegisterForm(request.POST)
+    [...]
 
-        if form.is_valid():
-            new_user = form.save()
-            new_user = authenticate(username=form.cleaned_data['username'],
-                                    password=form.cleaned_data['password1'],
-                                    )
-            login(request, new_user)
-
-            return redirect('gen')
 ```
+
+Le `render(request, 'accounts/register.html', context={'form': form})` retourne la page HTML suivante contenant le formulaire d'inscription. La balise `form` contient un attribut `action` qui pointe vers `register` avec la méthode POST. La balise `{% csrf_token %}` est utilisée pour inclure un jeton CSRF (Cross-Site Request Forgery) pour protéger contre les attaques de falsification de requêtes. Le formulaire s'affiche au travers de la variable de template `form` passée par le `context` de GET.
 
 ```html
 <body>
@@ -193,6 +210,26 @@ class Register(View):
         </form>
     </div>
 </body>
+```
+
+Quand le bouton "S'enregistrer" est pressé, on se retrouve dans la méthode `post`. Même principe que pour une requête GET, on instancie la classe `CustomUserRegisterForm` avec pour variable de classe `request.POST` contenant les données renseignées par le nouvel utilisateur fraichement retournées. La méthode vérifie si les données sont valides, par exemple si l'email renseigné contient un @ ou non. Si les données sont correctes, elles sont directement enregistrées dans la base de données, et l'utilisateur est authentifié (et redirigé vers `/gen`, on verra pourquoi).
+
+```python
+    class Register(View):
+
+    [...]
+
+    def post(self, request):
+        form = CustomUserRegisterForm(request.POST)
+
+        if form.is_valid():
+            new_user = form.save()
+            new_user = authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'],
+                                    )
+            login(request, new_user)
+
+            return redirect('gen')
 ```
 
 ### Le modèle de connection
