@@ -39,6 +39,8 @@ Je pense donc que Django est vraiment adapté pour ce type de projet.
 
 ## Mise en place du projet
 
+### La structure
+
 La structure de code à l’avantage d’être claire, les applications (fonctionnalités) utilisées par le serveur sont isolées dans leurs répertoires correspondants. C'est au developpeur d'imaginer la structure. Ci-dessous le répertoire du serveur [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp), dans lequel on retrouve les codes relatifs à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), aux [chats](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat), les [paramètres sur serveur](https://github.com/MalloryLP/sendapp/tree/main/sendapp/sendapp) et les répertoires liés au front-end, [static](https://github.com/MalloryLP/sendapp/tree/main/sendapp/static) et [template](https://github.com/MalloryLP/sendapp/tree/main/sendapp/templates). Le serveur est livré avec une base de données relationnelles sqlite3.
 
 <img src="images/root.jpg" width="600">  
@@ -63,6 +65,8 @@ J'ai voulu quelque chose de simple pour l'application avec une page d'accueil, d
 
 L'utilisateur demande à accéder à la page principale. Il n'est pas connecté. S'offre à lui deux choix : se connecter ou s'enregistrer. Une fois qu'il aura complété le formulaire, il sera connecté et redirigé vers la page /home. Celle-ci propose plusieurs options comme : se déconnecter, aller dans les paramètres du compte utilisateur et accéder à la messagerie.  
 En parallèle, l'administrateur du site peut demander la page /admin pour administer le site et sa base de données. Cette interface est implémenté directement à la création du serveur et peut être modifiée. 
+
+### Les urls
 
 La description des urls auquels l'utilisateur à accès sont disponibles dans les fichiers urls.py de chaque répertoire d'application correspondant. A ces urls sont associés des classes traités comme des vues. Ces classes gèrent les requettes HTTP GET et POST.
 
@@ -95,13 +99,13 @@ urlpatterns = [
 ]
 ```
 
-Par exemple, on peut analyser les codes impliqués la création de compte d'un utilisateur. D'après le diagramme fonctionnel, il faut aller à la page /register.
+Par exemple, on peut analyser les codes impliqués la création de compte d'un utilisateur. D'après le diagramme fonctionnel, il faut aller à la page `/register`.
 
 ```python
 path('register/', views.Register.as_view(), name='register'),
 ```
 
-La classe Register() est traitée comme une vue. Django permet de nommer les urls liés au classes pour pouvoir directement les appeler dans d'autre parties du code.
+La classe `Register` est traitée comme une vue. Django permet de nommer les urls liés au classes pour pouvoir directement les appeler dans d'autre parties du code.
 
 Ci-dessous la classe `Register` qui hérite de la classe `View`, avec les méthodes `get` et `post` qui ont étés surchargées.
 
@@ -127,3 +131,9 @@ class Register(View):
 ```
 
 Quand le navigateur fait la requête GET sur `/register`, la méthode `get` permet de retourner le formulaire d'inscription avec la méthode `render`, qui retourne la page HTML et le contexte. Le contexte est un dictionnaire pour passer informations au HTML tel que des variables ou des formulaires ici. Le formulaire d'inscription est aussi une classe, on verra son implémentation par la suite. Quand l'utilisateur veut envoyer des informations vers le serveur (données du formulaire), c'est la méthode `post` qui va être utilisé. On récupère les informations de la requêtes au travers de `request`, on traite les données et le navigateur est redirigé vers la page `gen` avec la méthode `redirect`. Le nom d'url `gen` est associé à la classe `KeyGen` comme vu plus haut.
+
+### Le modèle création du compte
+
+### Le modèle connection
+
+### Le modèle chat

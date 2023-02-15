@@ -42,4 +42,4 @@ Voici quelques projets de messageries disponibles sur Github avec les frameworks
 | [node-chat](https://github.com/igorantun/node-chat)  | NodeJS  | Aucune  | 
 | [chatroom](https://github.com/systenics/ChatRoom)  | Express  | Aucune  | 
 
-De manière générale, on retrouve plusieurs dizaines de messageries basés sur ces frameworks. Je ne suis pas parvenu à trouver des projets qui fond référence à l'aspect sécurité de la messagerie. La grande majorité des projets disponibles sur internet sont des embryons de messagerie, des preuves de concept. Il y a donc quelque chose de nouveau à implémenter.
+De manière générale, on retrouve plusieurs dizaines de messageries basés sur ces frameworks. Je ne suis pas parvenu à trouver des projets qui fond référence à l'aspect sécurité de la messagerie. La grande majorité des projets disponibles sur internet sont des embryons de messagerie, des preuves de concept. Il y a donc quelque chose de nouveau à implémenter.  

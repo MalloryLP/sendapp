@@ -41,3 +41,13 @@ cd sendapp
 $env:DJANGO_SETTINGS_MODULE = 'sendapp.settings'
 daphne -e ssl:8001:privateKey=./sendapp/code.pem:certKey=./sendapp/certif.pem sendapp.asgi:application
 ```
+
+## Let's chat !
+
+Allez à l'url suivante dans votre navigateur internet préféré sur smartphone :
+
+```url
+https://[host_machine_ip]:8000/home
+```
+
+Connectez-vous ou créez un compte, discuttez :smiley:
