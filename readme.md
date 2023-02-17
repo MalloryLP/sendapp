@@ -1,3 +1,5 @@
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django?color=g)
+
 > [Mallory Lehuault-Parc](https://github.com/MalloryLP) - FIPA SE 2023
 
 ## Introduction
