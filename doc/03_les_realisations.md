@@ -1,5 +1,7 @@
 # Ce qui a été réalisé
 
+### Réalisation
+
 | Etat | Fonctions |
 |------|----------|
 | :green_square: | Procurer un service de messagerie instantanée mais à l'échelle d'un foyer |
@@ -9,6 +11,8 @@
 | :green_square: | Garantir une intimité numérique sur les réseaux de tous les services en les chiffrant de bout en bout |
 | :green_square: | Se connecter sur un point d'accès internet de type fibre à la maison |
 | :green_square: | De proposer une interface simple de configuration (éventuellement textuelle) |
+
+### Propositions d'améliorations
 
 | Etat | Modifications |
 |------|---------------|

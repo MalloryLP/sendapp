@@ -152,7 +152,7 @@ Comme pour toutes messageries intantannées, il faut pouvoir créer son compte. 
 
 Le formulaire est basé sur la classe `CustomUserRegisterForm` qui hérite de la classe `UserCreationForm`. Là est la force de ce framework, le backend est lié au frontend par l'intermédiaire de classes, ce qui permet de developper des codes clairs et lisibles, sans ambiguités.
 
-Le formulaire inclut six champs, chacun avec un libellé et un widget personnalisé qui ajoute des attributs de style à chaque champ. Les six champs sont `username`, `email`, `first_name`, `last_name`, `password1`, et `password2`.
+Le formulaire inclut six champs, chacun avec un libellé et un widget personnalisé qui ajoute des attributs de style à chaque champ. Les six champs sont `username`, `email`, `first_name`, `last_name`, `password1`, et `password2`. Le paramètre `attr` permet de definir les attributs de style à appliquer sur les champs.
 
 Le formulaire utilise la méthode `save()` pour enregistrer l'utilisateur dans la base de données, en appelant la méthode `create_user()` de Django. La valeur de `commit` est définie par défaut sur True, ce qui signifie que l'utilisateur sera enregistré immédiatement en appelant la méthode `save()`.
 
@@ -233,7 +233,13 @@ Quand le bouton "S'enregistrer" est pressé, on se retrouve dans la méthode `po
 ```
 
 ### Le modèle de connection
+Le principe de connexion au site est classique. Il s'agit d'un formulaire de connexion. Il contient les champs `username` et `password`, ainsi qu'un bouton pour se connecter.
 
+<p align="center" width="100%">
+    <img src="images/login.png" width="50%"> 
+</p>
+
+Son fonctionnement est très simple, son implémentation est bien décrite dans la documentation de Django. Cela ce base sur la vue `Login`. Même principe, quand un navigateur fait une requête GET sur `/login`, si l'utilisateur est déjà authenifié, on redirige vers `/home`, sinon on retourne la page HTML `login.html` contenant le formulaire de connexion.
 ```python
 class Login(View):
 
@@ -242,6 +248,29 @@ class Login(View):
             return redirect('home')
         else:
             return render(request, 'accounts/login.html')
+
+    [...]
+```
+
+Ci-dessous le code HTML de la page `login.html` contenant le formulaire de connexion. On retrouve le token CSRF pour protéger l'utilisateur et le formulaire avec le bouton `Se connecter`. De la même manière, quand le bouton "S'enregistrer" est pressé, on se retrouve dans la méthode `post` coté serveur.
+
+```html
+<form class="login-form" action="{% url 'login' %}" method="POST">
+    {% csrf_token %}
+    <input class="username" type="text" placeholder="Nom d'utilisateur" name="username" />
+    <input class="password" type="password" placeholder="Mot de passe" name="password" />
+    <button class="loginbtn">Se connecter</button>
+    <span class="register">Pas encore membre ?</span>
+    <a class="registerbtn" href="{% url 'register' %}">S'enregistrer</a>
+</form>
+```
+
+La méthode `post` est appelée quand le bouton "Se connecter" est pressé. Elle vérifie si les données sont correctes, et si elles sont correctes, elle redirige vers `/home`, sinon elle retourne la page HTML `login.html` une nouvelle fois contenant le formulaire de connexion avec un message d'erreur.
+
+```python
+class Login(View):
+
+    [...]
 
     def post(self, request):
         username = request.POST.get('username')
@@ -255,17 +284,6 @@ class Login(View):
                 return redirect('home')
         else:
             return render(request, 'accounts/login.html', context={"login_error" : "Nom d'utilisateur ou mot de passe incorrect."})
-```
-
-```html
-<form class="login-form" method="POST">
-    {% csrf_token %}
-    <input class="username" type="text" placeholder="Nom d'utilisateur" name="username" />
-    <input class="password" type="password" placeholder="Mot de passe" name="password" />
-    <button class="loginbtn">Se connecter</button>
-    <span class="register">Pas encore membre ?</span>
-    <a class="registerbtn" href="{% url 'register' %}">S'enregistrer</a>
-</form>
 ```
 
 ### Le modèle de chat
