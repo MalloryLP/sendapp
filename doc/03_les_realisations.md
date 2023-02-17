@@ -1,6 +1,6 @@
 # Ce qui a été réalisé
 
-### Réalisation
+### Réalisation impératives
 
 | Etat | Fonctions |
 |------|----------|
@@ -12,11 +12,11 @@
 | :green_square: | Se connecter sur un point d'accès internet de type fibre à la maison |
 | :green_square: | De proposer une interface simple de configuration (éventuellement textuelle) |
 
-### Propositions d'améliorations
+### Propositions d'améliorations à apporter
 
 | Etat | Modifications |
 |------|---------------|
 | :orange_square: | Refonte du système de génération de clées |
-| :red_square: | Refaire le design du site |
+| :orange_square: | Envoie d'images chiffrées |
 | :red_square: | Calendrier partagé |
 | :red_square: | Service d'emails |
