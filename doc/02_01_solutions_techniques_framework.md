@@ -288,6 +288,10 @@ class Login(View):
 
 ### Le modèle de chat
 
+Avec Django, on peut en plus d'enregistrer les utilisateurs, créer des modèles. Définis, chaque instanciation du modèle sera enregistré dans la base de données. Ainsi, je souhaite que les messages soient enregistrés dans la base de données. Je crée un modèle `ChatModel` qui sera utilisé pour enregistrer les messages.
+
+Une instance de "Chat" est caractérisée par celui qui envoie le message (`sender`), le contenu du message (`message`), le nom du thread (`thread_name`), et la date de création du message (`timestamp`). `threan_name` est un nom unique pour chaque conversations, on verra comment il est construit dans quelques lignes.
+
 ```python
 class ChatModel(models.Model):
     sender = models.CharField(max_length=100, default=None)
@@ -298,6 +302,18 @@ class ChatModel(models.Model):
     def __str__(self):
         return self.message
 ```
+
+Ci-dessous la page permettant d'envoyer des messages à ses amis :
+<p align="center" width="100%">
+    <img src="images/chat.png" width="50%"> 
+</p>
+
+L'affichage et la récupération des messages dans la base de données se passe dans la classe `Chat`. Quand on clique sur le nom d'un amis pour discutter, on passe par cet URL : `chat/<str:username>/`. Dans la photo ci-dessus, pour discutter avec Bob, la requête se fait vers `chat/bob.qwerty/`, bob.qwerty est alors contenu dans la variable `username`. La méthode `get` est chargée de récupérer les messages d'un thread spécifique et de les afficher dans le chat courant.`thread_name` est une variable utilisée dans la méthode `get()` de la classe `Chat` pour identifier le nom du fil de discussion entre deux utilisateurs. Le nom du fil de discussion est une chaîne qui identifie de manière unique un fil de discussion entre deux utilisateurs. Le nom du fil de discussion est généré en concaténant les ID de l'utilisateur authentifié et de l'utilisateur ami dans l'ordre croissant, séparés par un `-`. Les ID sont attribués par Django pour chaque utilisateur. Cela permet de garantir que le même nom de fil de discussion est utilisé, quel que soit l'ordre dans lequel les ID des utilisateurs sont fournis, et donc que les messages des deux utilisateurs sont regroupés dans le même fil de discussion.
+
+Par exemple, si l'utilisateur authentifié a un ID de 1 et l'utilisateur ami un ID de 2, le nom du fil de discussion sera "chat_1-2". Si les identifiants étaient inversés, le nom du fil de discussion serait toujours "chat_1-2". 
+
+On remarque qu'il n'y a pas de methode `post`. Les messages ne passent pas directement par le serveur Django.
+
 
 ```python
 class Chat(View):
@@ -323,7 +339,6 @@ class Chat(View):
 
         users = User.objects.exclude(username=request.user.username)
         return render(request, 'chat/chat.html', context={'requested_user_id' : f"{friend_id}" ,'users': users, 'messages' : send_messg, 'friend' : username, 'count' : len(send_messg)})
-
 
     def post(self, request):
         pass

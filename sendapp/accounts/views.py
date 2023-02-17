@@ -122,3 +122,4 @@ class EncryptionKey(View):
             privatekey.save()
 
         return render(request, 'chat/friendsnav.html')
+    

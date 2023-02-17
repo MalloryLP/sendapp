@@ -5,4 +5,4 @@ from chat.models import ChatModel
 
 admin.site.register(ChatModel)
 
-#python manage.py migrate --run-syncdb   
+#python manage.py migrate --run-syncdb

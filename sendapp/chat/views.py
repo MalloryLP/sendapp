@@ -16,7 +16,7 @@ channel_layer = get_channel_layer()
 class Home(View):
 
     def get(self, request):
-        users = User.objects.exclude(username=request.user.username)
+        users = User.objects.exclude(id__in=[request.user.id, 1]).exclude(username='superuser')
         return render(request, 'chat/friendsnav.html', context={'users': users})
 
     def post(self, request):
@@ -43,9 +43,8 @@ class Chat(View):
             send_messg.append([f"{senders[user_obj_temp.id]}", f"{mesg.message}"])        
             #send_messg.append([f"{mesg.sender}", f"{mesg.message}", mesg.timestamp])
 
-        users = User.objects.exclude(username=request.user.username)
+        users = User.objects.exclude(id__in=[request.user.id, 1]).exclude(username='superuser')
         return render(request, 'chat/chat.html', context={'requested_user_id' : f"{friend_id}" ,'users': users, 'messages' : send_messg, 'friend' : username, 'count' : len(send_messg)})
-
 
     def post(self, request):
         pass
