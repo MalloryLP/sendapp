@@ -22,17 +22,17 @@ Le projet fonctionne avec Python et dépend de ces paquets :
 - channels
 - django-sslserver
 
-Mise en place de l'environnement sur Windows:
+Mise en place de l'environnement virtuel Python sur Windows:
 
 ```powershell
-python -m venv .venv
-. .venv/Scripts/activate.ps1
-pip install -r requirements.txt
+$env:PIPENV_VENV_IN_PROJECT=1
+python -m pipenv install -r ./requirements.txt
+python -m pipenv shell
 ```
 
 ## Lancement
 
-Sur windows dans deux shells distincs :
+Sur windows dans deux shells venv distincs :
 ```powershell
 cd sendapp
 python ./manage.py runsslserver --certificate ./sendapp/certif.pem --key ./sendapp/code.pem 0.0.0.0:8000

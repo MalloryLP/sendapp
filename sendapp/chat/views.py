@@ -1,11 +1,14 @@
-from traceback import print_tb
 from django.views import View
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from django.contrib.auth import get_user_model
 from channels.layers import get_channel_layer
 
-import json
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+localip = s.getsockname()[0]
+s.close()
 
 from chat.models import ChatModel
 
@@ -44,7 +47,8 @@ class Chat(View):
             #send_messg.append([f"{mesg.sender}", f"{mesg.message}", mesg.timestamp])
 
         users = User.objects.exclude(id__in=[request.user.id, 1]).exclude(username='superuser')
-        return render(request, 'chat/chat.html', context={'requested_user_id' : f"{friend_id}" ,'users': users, 'messages' : send_messg, 'friend' : username, 'count' : len(send_messg)})
+
+        return render(request, 'chat/chat.html', context={'requested_user_id' : f"{friend_id}" ,'users': users, 'messages' : send_messg, 'friend' : username, 'count' : len(send_messg), 'localip': localip})
 
     def post(self, request):
         pass

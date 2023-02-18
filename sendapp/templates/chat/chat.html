@@ -46,13 +46,15 @@
 <script>
 
     const username = '{{user.username}}';
-    const friend = '{{friend}}'
+    const friend = '{{friend}}';
     const friend_id = '{{requested_user_id}}';
-    const previous_msgs = {{ messages|safe }};   
+    const previous_msgs = {{ messages|safe }};
+    const localip = `{{localip}}`;   
 
     const socket = new WebSocket(
         'wss://'
-        + '192.168.1.124:8001'
+        + localip
+        + ':8001'
         + '/ws/'
         + friend_id
         + '/'
@@ -83,7 +85,7 @@
         document.querySelector('#connection_status').innerHTML = `Une erreur est survenue`;
     }
 
-    function convertPemToBinary(pem) {
+    function convertPemToBinary(pem){
         var lines = pem.split('\n')
         var encoded = ''
         for(var i = 0;i < lines.length;i++){
