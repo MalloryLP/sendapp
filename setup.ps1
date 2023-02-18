@@ -1,3 +1,3 @@
-python -m venv .venv
-. .venv/Scripts/activate.ps1
-pip install -r ./requirements.txt
+$env:PIPENV_VENV_IN_PROJECT=1
+python -m pipenv install -r ./requirements.txt
+python -m pipenv shell
