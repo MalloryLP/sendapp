@@ -22,7 +22,9 @@ En rédigant ce rapport, j'ai appris que dans plusieurs cas d'applications, on p
 
 Avec toutes ces informations, j'ai décidé d'implémenter un algorithme de type RSA à deux clés pour cette messagerie. Dans une premier temps, je voulais montrer qu'il était possible d'implémenter un tel algorithme pour cette messagerie et mettre l'aspect sécurité de coté (en début de projet) en suivant ce schéma :
 
-//DIAGRAMME GENERATION DES CLES
+<p align="center" width="100%">
+    <img src="images/key_gen.png" width="70%">  
+</p>
 
 Cette implémentation n'est pas du tout sécurisé et présente plusieurs failles comme le fait que la clé privée doit être connue que par son propriétaire (même le serveur soit l'ignorer). Le fait de la transmettre du serveur au propriétaire via une requête HTTP fait que le chiffrement est vulnérable. J'explique quelles solutions pourraient être mises en oeuvre pour contrer ces problèmes dans la partie [04_les_ameliorations](https://github.com/MalloryLP/sendapp/tree/main/doc/04_les_ameliorations.md).
 
