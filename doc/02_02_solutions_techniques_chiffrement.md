@@ -38,7 +38,7 @@ L'ensemble du code générateur de clées est contenu dans le Javascript de la p
 Elle est disponible dans les navigateurs modernes, tels que Google Chrome, Mozilla Firefox, Safari, Microsoft Edge, etc. Cette API fournit des fonctions pour la génération de clés, le chiffrement et le déchiffrement de données, la création de signatures numériques, et d'autres opérations.  
 Parmi les algorithmes de chiffrement disponibles dans la librairie crypto.subtle, on peut citer le chiffrement symétrique (AES, DES, etc.), le chiffrement asymétrique (RSA, ECDSA, etc.), et les fonctions de hachage (SHA-1, SHA-256, etc.).
 
-Au chargement de la page, est directement appelé la fonction `generateKey`.
+Au chargement de la page, est directement appelé la fonction `generateKey`. Cette fonction va générer une paire de clées (clé publique et privée).
 
 ```javascript
 function generateKey(alg, scope) {
@@ -73,11 +73,11 @@ Le type de clés générées est défini dans `encryptAlgorithm` :
 
 - `name`, le nom de l'agorithme de chiffrement.
 - `modulusLength`, la longueur en bits du modulus, qui est de 2048 bits dans ce cas. Le modulus est le produit des deux nombres premiers p et q utilisés dans le chiffrement RSA. Une longueur de 2048 bits est généralement considérée comme sûre pour les applications de sécurité à long terme.
-- `publicExponent`, est l'exposant public utilisé dans le chiffrement RSA. Dans ce cas, il est défini comme un tableau d'octets Uint8Array([1, 0, 1]). C'est un paramètre qui est utilisé pour chiffré les données.
+- `publicExponent`, est l'exposant public utilisé dans le chiffrement RSA. Dans ce cas, il est défini comme un tableau d'octets Uint8Array([1, 0, 1]). C'est un paramètre qui est utilisé pour chiffré les données couramment.
 - `extractable`, est un booléen qui indique si la clé générée peut être extraite de la mémoire ou non. Dans ce cas, elle est définie comme false.
 - `hash`, défini les paramètres du hachage à utiliser avec l'algorithme de chiffrement RSA-OAEP. Dans ce cas, le hachage est SHA-256, qui est une fonction de hachage cryptographique sécurisée.
 
-Dès que les clés sont générées, je les tests directement sur une chaine de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clées sont transmissent au serveur.
+Dès que les clés sont générées, elles sont directement testés sur une chaine de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clées sont transmissent au serveur. Sinon, `no_key` est transmit au serveur, cela pourra être traité par la suite.
 
 ```javascript
 var message = "Quelle est la reponse de la vie ? 42."
@@ -102,7 +102,9 @@ if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
 }
 ```
 
-On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté. C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
+La variable `vector` représente un vecteur d'initialisation généré de manière aléatoire et utilisé dans le chiffrement/déchiffrement du message. Ce vecteur est une valeur aléatoire de taille fixe qui est utilisée pour garantir l'unicité des données cryptées.
+
+On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
 
 ```text
 -----BEGIN RSA PUBLIC KEY-----
@@ -131,6 +133,8 @@ jrag/Eao9NFQglzH8fIAZ+MrivNY5lKf/KHaZ+UYdDTHAvkVM5h/rwvyLFzjx30O
 9BjWIwUSF6aAKNg9qO/ncVc=
 -----END RSA PRIVATE KEY-----
 ```
+
+Il n'existe pas de fonction capable de réaliser une telle transformation. Cela doit se faire manuellement avec une boucle dans le fonction `convertBinaryToPem`.
 
 ```javascript
 function convertBinaryToPem(binaryData, label) {
@@ -169,4 +173,72 @@ function exportPrivateKey(keys) {
 }
 ```
 
+Il ne reste plus qu'à transmettre les clées de chiffrement au serveur avec la fonction `sendInfos`. Cette fonction reste assez simple, elle crée une instance `XMLHttpRequest` et l'envoie au serveur. Cette requête est dirigé vers l'url `/api` en charge des clées de chiffrement d'après la définition dans `urls.py` : `path('api/', views.EncryptionKey.as_view(), name='api')`. Sécurité oblige, doit être transmit dans le header au serveur le `crsftoken` sinon la requête n'est pas traitée. Dans le corps de la requête, on transmet le nom du propriétaire des clées et leurs valeurs.
+
+```javascript
+function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
+    var crsftoken = '{{ csrf_token }}'
+    const requestObj = new XMLHttpRequest()
+    requestObj.open('POST', "{% url 'api' %}")
+    requestObj.setRequestHeader("X-CSRFToken", crsftoken)
+    requestObj.send(JSON.stringify({
+        "user": '{{ user.username }}',
+        "publicKey": f_exportedPublicKey,
+        "privateKey": f_exportedPrivateKey
+    }))
+}
+```
+
+Quand on regarde de plus près le vue associé à l'url `/api`, on peut voir qu'à chaque requête POST, le corps est analysé pour recupérer les clés de chiffrement et le nom du propriétaire des clées. Si ce nom est déjà associé à une clé de chiffrement, on met à jour la clé (impossible pour le moment mais implémenté en backend), sinon on la sauvegarde dans la base de données.
+
+```python
+class EncryptionKey(View):
+
+    def get(self, request):
+
+    [...]
+
+    def post(self, request):
+
+        body = json.loads(request.body.decode('utf-8'))
+        owner = body["user"]
+        pub = body["publicKey"]
+        pri = body["privateKey"]
+
+        if PublicKey.objects.filter(owner=owner).exists():
+            print("Public key updated !")
+            obj, created = PublicKey.objects.update_or_create(owner = owner, defaults={"pub": pub})
+        else:
+            print("Public key created !")
+            publicKey = PublicKey()
+            
+            publicKey.owner = owner
+            publicKey.pub = pub
+            publicKey.save()
+
+        if PrivateKey.objects.filter(owner=owner).exists():
+            print("Private key updated !")
+            obj, created = PrivateKey.objects.update_or_create(owner = owner, defaults={"pri": pri})
+        else:
+            print("Private key created !")
+            privatekey = PrivateKey()
+            
+            privatekey.owner = owner
+            privatekey.pri = pri
+            privatekey.save()
+
+        return render(request, 'chat/friendsnav.html')
+```
+
+Comme pour la classe `ChatModel` qui sert à enregistrer chaque message dans la base de données, sont crées deux classes `PublicKey` et `PrivateKey` pour les sauvegarder et charger correctement. Dans le code précédent, `.save()` sauvegarde la clé dans la base de données.
+
+```python
+class PublicKey(models.Model):
+    owner = models.TextField()
+    pub = models.TextField()
+
+class PrivateKey(models.Model):
+    owner = models.TextField()
+    pri = models.TextField()
+```
 ### Chiffrement des messages

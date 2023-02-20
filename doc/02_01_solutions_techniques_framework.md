@@ -288,7 +288,7 @@ class Login(View):
 
 ### Le modèle de chat
 
-Avec Django, on peut en plus d'enregistrer les utilisateurs, créer des modèles. Définis, chaque instanciation d'un modèle sera enregistré dans la base de données, comme les utilisateurs. Ainsi, je souhaite que les messages soient enregistrés dans la base de données. Je crée un modèle `ChatModel` qui sera utilisé pour enregistrer les messages.
+Avec Django, on peut en plus d'enregistrer les utilisateurs, créer des modèles. Définis, chaque instanciation d'un modèle sera enregistré dans la base de données, comme les utilisateurs. Ainsi, je souhaite que les messages soient enregistrés dans la base de données. Je crée un modèle `ChatModel` qui sera utilisé pour enregistrer les messages. Cela permet de ne pas avoir à faire des requêtes SQL vers la base de données pour enregister les données. Chaque instance suivie de la méthode `.save()` sera enregistrée dans la base de données.
 
 Un message est caractérisée par celui qui envoie le message (`sender`), le contenu du message (`message`), le nom du thread (`thread_name`), et la date de création du message (`timestamp`). `threan_name` est un nom unique pour chaque conversations, on verra comment il est construit dans quelques lignes.
 
@@ -321,13 +321,13 @@ else:
 
 Par exemple, si l'utilisateur authentifié a un ID de 1 et l'utilisateur ami un ID de 2, le nom du fil de discussion sera "chat_1-2". Si les identifiants étaient inversés, le nom du fil de discussion serait toujours "chat_1-2". 
 
-C'est ainsi, la `get()` charge tous les messages précédement envoyés pour les charger dans le fil de discussion courant.
+C'est ainsi que la méthode `get()` charge tous les messages précédement envoyés pour les charger dans le fil de discussion courant.
 
 ```python
 message_objs = ChatModel.objects.filter(thread_name=thread_name)
 ```
 
-On remarque qu'il n'y a pas de methode `post`. Les messages ne passent pas directement par le serveur Django.
+On remarque qu'il n'y a pas de methode `post`. Les messages ne passent pas directement par le serveur Django. Les messages sont seulement chargés par Django, un autre système permet de les sauvegarder.
 
 
 ```python
