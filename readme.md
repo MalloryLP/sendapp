@@ -22,8 +22,12 @@ Le projet fonctionne avec Python et dépend de ces paquets :
 - channels
 - django-sslserver
 
-Mise en place de l'environnement virtuel Python sur Windows:
+Mise en place de l'environnement de développement sur Linux :
+```shell
+TODO
+```
 
+Mise en place de l'environnement virtuel Python sur Windows:
 ```powershell
 $env:PIPENV_VENV_IN_PROJECT=1
 python -m pipenv install -r ./requirements.txt
@@ -31,6 +35,11 @@ python -m pipenv shell
 ```
 
 ## Lancement
+
+Sur Linux dans deux sheels venv distincs :
+```shell
+TODO
+```
 
 Sur windows dans deux shells venv distincs :
 ```powershell

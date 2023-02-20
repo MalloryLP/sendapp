@@ -32,4 +32,141 @@ Cette implémentation n'est pas du tout sécurisé et présente plusieurs faille
 
 ### Génération des clés de chiffrement
 
+En partant du principe que le serveur ne doit pas connaitre la clé privée, je décide que la génération des clées se fait chez le client. Le code générateur est transmit au client lors de la requête GET vers `/gen`.
+
+L'ensemble du code générateur de clées est contenu dans le Javascript de la page html `key_gen.html`. Ce code se base sur `crypto.subtle` de l'API Javascript qui permet de réaliser des opérations de chiffrement au sein d'un navigateur web.  
+Elle est disponible dans les navigateurs modernes, tels que Google Chrome, Mozilla Firefox, Safari, Microsoft Edge, etc. Cette API fournit des fonctions pour la génération de clés, le chiffrement et le déchiffrement de données, la création de signatures numériques, et d'autres opérations.  
+Parmi les algorithmes de chiffrement disponibles dans la librairie crypto.subtle, on peut citer le chiffrement symétrique (AES, DES, etc.), le chiffrement asymétrique (RSA, ECDSA, etc.), et les fonctions de hachage (SHA-1, SHA-256, etc.).
+
+Au chargement de la page, est directement appelé la fonction `generateKey`.
+
+```javascript
+function generateKey(alg, scope) {
+    return new Promise(function(resolve) {
+        var genkey = crypto.subtle.generateKey(alg, true, scope)
+        genkey.then(function (pair) {
+            resolve(pair)
+        })
+    })
+}
+
+[...]
+
+var encryptAlgorithm = {
+    name: "RSA-OAEP",
+    modulusLength: 2048,
+    publicExponent: new Uint8Array([1, 0, 1]),
+    extractable: false,
+    hash: {
+        name: "SHA-256"
+    }
+}
+
+var scopeEncrypt = ["encrypt", "decrypt"]
+
+var keys = await generateKey(encryptAlgorithm, scopeEncrypt).then(function(keys){
+    return keys
+})
+```
+
+Le type de clés générées est défini dans `encryptAlgorithm` :
+
+- `name`, le nom de l'agorithme de chiffrement.
+- `modulusLength`, la longueur en bits du modulus, qui est de 2048 bits dans ce cas. Le modulus est le produit des deux nombres premiers p et q utilisés dans le chiffrement RSA. Une longueur de 2048 bits est généralement considérée comme sûre pour les applications de sécurité à long terme.
+- `publicExponent`, est l'exposant public utilisé dans le chiffrement RSA. Dans ce cas, il est défini comme un tableau d'octets Uint8Array([1, 0, 1]). C'est un paramètre qui est utilisé pour chiffré les données.
+- `extractable`, est un booléen qui indique si la clé générée peut être extraite de la mémoire ou non. Dans ce cas, elle est définie comme false.
+- `hash`, défini les paramètres du hachage à utiliser avec l'algorithme de chiffrement RSA-OAEP. Dans ce cas, le hachage est SHA-256, qui est une fonction de hachage cryptographique sécurisée.
+
+Dès que les clés sont générées, je les tests directement sur une chaine de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clées sont transmissent au serveur.
+
+```javascript
+var message = "Quelle est la reponse de la vie ? 42."
+var vector = crypto.getRandomValues(new Uint8Array(16))
+
+var encryptedData = await encryptData(vector, keys.publicKey, message).then(function(encryptedData){
+    console.log(arrayBufferToBase64(encryptedData))
+    return encryptedData
+})
+
+var result = await decryptData(vector, keys.privateKey, encryptedData).then(function(result){
+    console.log(arrayBufferToText(result))
+    return result
+})
+
+[...]
+
+if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
+    window.onload = sendInfos(exportedPublicKey, exportedPrivateKey);
+}else{
+    window.onload = sendInfos("no_key", "no_key");
+}
+```
+
+On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté. C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
+
+```text
+-----BEGIN RSA PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArskTtxcaCUeTpddgR62w
+E3ePjQziGWcTNtvXvCTiP65012DcXdZycBGBNt0fsC0PPzU5B1fZIgixeMjOdrEl
+XehLRE3NU7Rx9Km4qKC732f7xc7vR4WzxUMFN/DS6uM7vc3BvRHZ+Ci34MScCPGK
+9UXlC9wbirfB9fXiQPtuyMPBwjtLRcupDD7WCMfdRuwVh0CiK147bGUcoKiviEnB
+euVl3/QPSiOb7OA2CzaPQsVZBob5YvvdjpaxPIvMNDEfNX18wBeAjZdoSLaz9Pze
+DnoVinvMjcrRaF17VyFyM+/flp8ChkjEhrFVgfgvfo/JjCXozf2WEZbM15AA5y5G
+jwIDAQAB
+-----END RSA PUBLIC KEY-----
+```
+
+
+```text
+-----BEGIN RSA PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCuyRO3FxoJR5Ol
+12BHrbATd4+NDOIZZxM229e8JOI/rnTXYNxd1nJwEYE23R+wLQ8/NTkHV9kiCLF4
+yM52sSVd6EtETc1TtHH0qbiooLvfZ/vFzu9HhbPFQwU38NLq4zu9zcG9Edn4KLfg
+
+[...]
+
+3KE3YA7xrXwubRtsoVZWsAImzCAvozNw3rtkbwSvAoGAPkD/jLRWu5xfjtAkTBDb
+uQO3F1TxVl03fKqrtS5G3nOw2jubUCXYlpt2/I93FlfcjtocMhN/b3QclGPWnQxS
+jrag/Eao9NFQglzH8fIAZ+MrivNY5lKf/KHaZ+UYdDTHAvkVM5h/rwvyLFzjx30O
+9BjWIwUSF6aAKNg9qO/ncVc=
+-----END RSA PRIVATE KEY-----
+```
+
+```javascript
+function convertBinaryToPem(binaryData, label) {
+    var base64Cert = arrayBufferToBase64String(binaryData)
+    var pemCert = "-----BEGIN " + label + "-----\r\n"
+    var nextIndex = 0
+    var lineLength
+    while (nextIndex < base64Cert.length) {
+        if (nextIndex + 64 <= base64Cert.length) {
+        pemCert += base64Cert.substr(nextIndex, 64) + "\r\n"
+        } else {
+        pemCert += base64Cert.substr(nextIndex) + "\r\n"
+        }
+        nextIndex += 64
+    }
+    pemCert += "-----END " + label + "-----\r\n"
+    return pemCert
+}
+
+function exportPublicKey(keys) {
+    return new Promise(function(resolve) {
+        window.crypto.subtle.exportKey('spki', keys.publicKey).
+        then(function(spki) {
+        resolve(convertBinaryToPem(spki, "RSA PUBLIC KEY"))
+        })
+    })
+}
+
+function exportPrivateKey(keys) {
+    return new Promise(function(resolve) {
+        var expK = window.crypto.subtle.exportKey('pkcs8', keys.privateKey)
+        expK.then(function(pkcs8) {
+        resolve(convertBinaryToPem(pkcs8, "RSA PRIVATE KEY"))
+        })
+    })
+}
+```
+
 ### Chiffrement des messages
