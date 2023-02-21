@@ -138,11 +138,7 @@ jrag/Eao9NFQglzH8fIAZ+MrivNY5lKf/KHaZ+UYdDTHAvkVM5h/rwvyLFzjx30O
 -----END RSA PRIVATE KEY-----
 ```
 
-<<<<<<< HEAD
-De cette manière, on peut les enregistrer dans la base de données du serveur. Les opérations de convertions se fond à l'aide des fonctions ci-dessous. L'API Javascript `crypto.subtle` ne permet pas d'extraire les clées directement dans se format, une convertion avec la fonction `convertBinaryToPem`.
-=======
 Il n'existe pas de fonction capable de réaliser une telle transformation. Cela doit se faire manuellement avec une boucle dans le fonction `convertBinaryToPem`.
->>>>>>> 6498f1b94db119a6585d22c6920d373031fea580
 
 ```javascript
 function convertBinaryToPem(binaryData, label) {
