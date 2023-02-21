@@ -102,13 +102,9 @@ if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
 }
 ```
 
-<<<<<<< HEAD
-On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté. C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère. Les clées transmissent sont de la forme ci-dessous.
-=======
 La variable `vector` représente un vecteur d'initialisation généré de manière aléatoire et utilisé dans le chiffrement/déchiffrement du message. Ce vecteur est une valeur aléatoire de taille fixe qui est utilisée pour garantir l'unicité des données cryptées.
 
 On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
->>>>>>> 6498f1b94db119a6585d22c6920d373031fea580
 
 ```text
 -----BEGIN RSA PUBLIC KEY-----
