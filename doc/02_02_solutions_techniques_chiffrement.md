@@ -102,7 +102,7 @@ if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
 }
 ```
 
-On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté. C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
+On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté. C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère. Les clées transmissent sont de la forme ci-dessous.
 
 ```text
 -----BEGIN RSA PUBLIC KEY-----
@@ -131,6 +131,8 @@ jrag/Eao9NFQglzH8fIAZ+MrivNY5lKf/KHaZ+UYdDTHAvkVM5h/rwvyLFzjx30O
 9BjWIwUSF6aAKNg9qO/ncVc=
 -----END RSA PRIVATE KEY-----
 ```
+
+De cette manière, on peut les enregistrer dans la base de données du serveur. Les opérations de convertions se fond à l'aide des fonctions ci-dessous. L'API Javascript `crypto.subtle` ne permet pas d'extraire les clées directement dans se format, une convertion avec la fonction `convertBinaryToPem`.
 
 ```javascript
 function convertBinaryToPem(binaryData, label) {
