@@ -68,8 +68,6 @@ class EncryptionKey(View):
 
     def get(self, request):
 
-        print(request.headers["User"])
-
         if PublicKey.objects.filter(owner=request.headers["User"]).exists():
                 obj1 = PublicKey.objects.get(owner = request.headers["User"])
                 if PrivateKey.objects.filter(owner=request.headers["User"]).exists():

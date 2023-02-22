@@ -130,18 +130,18 @@
     fetch("{% url 'api' %}", options).then(response => response.json()).then(json => {
         const algorithm = {
             name: 'RSA-OAEP',
-            // specify the hash algorithm to use with the RSA key
             hash: 'SHA-256',
         };
 
-        // import the public key as an RSA-OAEP key
+        console.log(json);
+
         crypto.subtle.importKey(
             'spki',
-            convertPemToBinary(json.user.UserPublicKey),
+            convertPemToBinary(json.friend.FriendPublicKey),
             algorithm,
             false,
             ['encrypt']
-        ).then(function(userpublicKey){
+        ).then(function(friendpublicKey){
 
             document.querySelector('#chat-message-submit').onclick = function(e){
                 const message_input = document.querySelector('#message_input');
@@ -151,20 +151,19 @@
                     {
                         name: 'RSA-OAEP',
                     },
-                    userpublicKey,
+                    friendpublicKey,
                     textToArrayBuffer(message)
                 ).then(function(ciphertext){
-                    //console.log("Message chiffré à envoyer : ", new Uint8Array(ciphertext).toString())
+
                     socket.send(JSON.stringify({
                         'type': 'text',
                         'message': new Uint8Array(ciphertext).toString(),
                         'username' : username
                     }));
 
-                    //document.querySelector('#user-body').innerHTML += `${username} :`;
                     document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #838383;margin:10px;">${username} : ${message}<\div>`;
-
                     message_input.value = '';
+
                 })
 
             }
@@ -212,19 +211,19 @@
         // import the private key as an RSA-OAEP key
         crypto.subtle.importKey(
             'pkcs8',
-            convertPemToBinary(json.friend.FriendPrivateKey),
+            convertPemToBinary(json.user.UserPrivateKey),
             algorithm,
             false,
             ['decrypt']
-        ).then(function(friendprivateKey){
+        ).then(function(userprivateKey){
 
             crypto.subtle.importKey(
                 'pkcs8',
-                convertPemToBinary(json.user.UserPrivateKey),
+                convertPemToBinary(json.friend.FriendPrivateKey),
                 algorithm,
                 false,
                 ['decrypt']
-            ).then(function(userprivateKey){
+            ).then(function(friendprivateKey){
                 for(let i = 0; i < previous_msgs.length; i++){
                     const values = previous_msgs[i][1].split(",");
                     const numbers = values.map(value => parseInt(value, 10));
@@ -234,7 +233,7 @@
                             {
                                 name: "RSA-OAEP",
                             },
-                            userprivateKey,
+                            friendprivateKey,
                             message
                         ).then(function(message){
                             const uncrypted_message = arrayBufferToText(message)
@@ -246,7 +245,7 @@
                             {
                                 name: "RSA-OAEP",
                             },
-                            friendprivateKey,
+                            userprivateKey,
                             message
                         ).then(function(message){
                             const uncrypted_message = arrayBufferToText(message)
@@ -270,7 +269,7 @@
                             {
                                 name: "RSA-OAEP",
                             },
-                            friendprivateKey,
+                            userprivateKey,
                             message
                         ).then(function(message){
                             const uncrypted_message = arrayBufferToText(message)

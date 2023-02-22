@@ -189,7 +189,7 @@ function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
 }
 ```
 
-Quand on regarde de plus près le vue associé à l'url `/api`, on peut voir qu'à chaque requête POST, le corps est analysé pour recupérer les clés de chiffrement et le nom du propriétaire des clées. Si ce nom est déjà associé à une clé de chiffrement, on met à jour la clé (impossible pour le moment mais implémenté en backend), sinon on la sauvegarde dans la base de données.
+Quand on regarde de plus près le vue associé à l'url `/api`, on peut voir qu'à chaque requête POST, le corps de la requête est analysé pour recupérer les clés de chiffrement et le nom du propriétaire des clées. Si ce nom est déjà associé à une clé de chiffrement, on met à jour la clé (impossible pour le moment mais implémenté en backend), sinon on la sauvegarde dans la base de données.
 
 ```python
 class EncryptionKey(View):
@@ -242,3 +242,156 @@ class PrivateKey(models.Model):
     pri = models.TextField()
 ```
 ### Chiffrement des messages
+
+Il s'agit maintenant de chiffrer les messages. Dans un premier temps, il faut récupérer les clées de chiffrement qui sont stockées sur le serveur d'après le schéma.
+
+Dans un premier temps, il s'agit de mettre en place le html de la page `/chat` contenu dans `chat.html`.
+
+```html
+<div class="chatcontainer">
+    <div id="chat-body" style="width: 100%;">
+    </div>
+</div>
+
+<div class="usercontainer">
+    <input class="message_input" type="text" id="message_input" placeholder="Ecrire un message...">
+    <input class="file_input" type="file" id="chat-image-submit" name="image" accept="image/png, image/jpeg">
+    <button class="submit-btn" id="chat-message-submit">Envoyer</button>
+</div>
+```
+Les messages seront affichés dans la division `chat-body`. Pour les intéractions avec l'utilisateur, on retrouve un champs d'entrées `message_input`, un bouton pour uploader des images `file_input` et un bouton `submit-btn` pour envoyer le message.
+
+Il faut maintenant faire une requête GET vers l'API du serveur pour récupérer les clées.
+
+```javascript
+fetch("{% url 'api' %}", options).then(response => response.json()).then(json => {
+
+    console.log(json);
+
+    [...]
+
+};
+```
+Seront contenues dans `json`, au format JSON les clées. 
+
+<p align="center" width="100%">
+    <img src="images/json.png" width="70%">  
+</p>
+
+Elles sont retournées par la vue `EncryptionKey`. La méthode `get` vérifie si les utilisateurs courant de la conversation ont des clées existantes puis les retourne sous la forme d'une classe `JsonResponse`.
+
+```python
+class EncryptionKey(View):
+
+    [...]
+
+    def get(self, request):
+
+        if PublicKey.objects.filter(owner=request.headers["User"]).exists():
+                obj1 = PublicKey.objects.get(owner = request.headers["User"])
+                if PrivateKey.objects.filter(owner=request.headers["User"]).exists():
+                    obj2 = PrivateKey.objects.get(owner = request.headers["User"])
+                    if PublicKey.objects.filter(owner=request.headers["Referer"].split("/")[-2]).exists():
+                        obj3 = PublicKey.objects.get(owner = request.headers["Referer"].split("/")[-2])
+                        if PrivateKey.objects.filter(owner=request.headers["Referer"].split("/")[-2]).exists():
+                            obj4 = PrivateKey.objects.get(owner = request.headers["Referer"].split("/")[-2])
+
+                            return JsonResponse(
+                                {"user": {
+                                    "name": obj1.owner,
+                                    "UserPublicKey": obj1.pub,
+                                    "UserPrivateKey": obj2.pri
+                                }, "friend": {
+                                    "name": obj3.owner,
+                                    "FriendPublicKey": obj3.pub,
+                                    "FriendPrivateKey": obj4.pri
+                                }})
+                                
+        return JsonResponse({'publicKey': None, 'privateKey': None})
+```
+Les clées récupérées doivent être converties au format binaire originel de `crypto.subtle` à l'aide de la fonction `convertPemBinary`. Ainsi, on pourra correctement l'importer avec la fonction `crypto.subtle.importKey`. Divers paramètres y sont spécifiés comme le type de clé `name: 'RSA-OAEP'`.
+
+```javascript
+function convertPemToBinary(pem){
+    var lines = pem.split('\n')
+    var encoded = ''
+    for(var i = 0;i < lines.length;i++){
+        if (lines[i].trim().length > 0 &&
+            lines[i].indexOf('-BEGIN RSA PRIVATE KEY-') < 0 &&
+            lines[i].indexOf('-BEGIN RSA PUBLIC KEY-') < 0 &&
+            lines[i].indexOf('-END RSA PRIVATE KEY-') < 0 &&
+            lines[i].indexOf('-END RSA PUBLIC KEY-') < 0) {
+        encoded += lines[i].trim()
+        }
+    }
+    return base64StringToArrayBuffer(encoded)
+}
+
+[...]
+
+fetch("{% url 'api' %}", options).then(response => response.json()).then(json => {
+const algorithm = {
+    name: 'RSA-OAEP',
+    hash: 'SHA-256',
+};
+
+    crypto.subtle.importKey(
+        'spki',
+        convertPemToBinary(json.friend.FriendPublicKey),
+        algorithm,
+        false,
+        ['encrypt']
+    ).then(function(friendpublicKey){
+
+        [...]
+
+    };
+
+    crypto.subtle.importKey(
+        'pkcs8',
+        convertPemToBinary(json.user.UserPrivateKey),
+        algorithm,
+        false,
+        ['decrypt']
+    ).then(function(userprivateKey){
+
+        [...]
+
+    };
+};
+
+```
+
+Maintenant, on peut directement utiliser la clé publique `friendpublicKey` de l'amis auquel on veut envoyer un message pour le chiffrer et déchiffrer le message reçu avec sa clé privée `friendprivateKey`. 
+
+Le chiffrement se passe de cette manière : dès que l'utilisateur appuie sur le bouton `chat-message-submit`, on récupère le contenu du message `message_input`. On chiffre le message avec la méthode `crypto.subtle.encrypt` et on le récupère dans la variable `ciphertext`.
+
+```javascript
+document.querySelector('#chat-message-submit').onclick = function(e){
+
+    const message_input = document.querySelector('#message_input');
+    const message = message_input.value;
+
+    crypto.subtle.encrypt(
+        {
+            name: 'RSA-OAEP',
+        },
+        friendpublicKey,
+        textToArrayBuffer(message)
+    ).then(function(ciphertext){
+
+        console.log(ciphertext);
+
+        [...]
+
+    });
+};
+```
+
+Le `ciphertext` obtenu est alors un `Uint8Array` qui sera transmis.
+
+```shell
+100,219,184,42,65,209,122,184,206,45,224,31,234,214,171,236,20,97,103,90,73,63,147,121,43,42,116,99,33,205,170,250,184,67,173,188,111,39,127,102,78,209,202,115,167,131,120,133,228,93,237,159,170,232,23,157,243,40,148,69,28,191,171,247,106,110,22,99,81,7,138,85,121,164,169,92,197,195,199,137,80,35,133,75,241,184,49,133,19,16,221,21,124,108,141,206,226,246,131,251,131,80,156,82,122,154,91,218,120,45,35,246,255,62,172,239,15,144,80,209,80,153,200,13,27,35,68,200,80,38,214,186,216,60,177,140,229,249,163,214,208,42,58,121,64,223,159,95,30,175,45,26,53,56,79,57,159,68,231,76,188,195,93,177,173,159,238,2,236,237,62,120,58,163,169,190,117,69,25,34,54,45,132,86,60,155,60,27,5,137,106,36,187,14,207,131,33,116,68,98,57,75,230,232,137,224,12,47,27,16,91,28,128,42,192,185,175,183,78,171,29,30,45,0,148,199,176,201,16,196,35,63,139,96,15,72,230,246,69,198,60,198,32,203,150,195,184,88,207,141,136,224,33,66,107,38
+```
+
+On peut noter que pour un même message, la version chiffré sera toujours différente.

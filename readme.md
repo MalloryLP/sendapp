@@ -53,6 +53,20 @@ $env:DJANGO_SETTINGS_MODULE = 'sendapp.settings'
 daphne -e ssl:8001:privateKey=./sendapp/code.pem:certKey=./sendapp/certif.pem sendapp.asgi:application
 ```
 
+## Potentiels problèmes
+
+Si vous rencontrez un problème lié aux modèles de données :
+- Supprimez la base de données `db.sqlite3`
+- Lancez la commande
+```shell
+python manage.py migrate --run-syncdb
+```
+
+Si vous avez besoin de créer un compte administrateur :
+```shell
+python manage.py createsuperuser
+```
+
 ## Let's chat !
 
 Allez à l'url suivante dans votre navigateur internet préféré sur smartphone :
