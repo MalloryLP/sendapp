@@ -102,7 +102,7 @@ if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
 }
 ```
 
-La variable `vector` représente un vecteur d'initialisation généré de manière aléatoire et utilisé dans le chiffrement/déchiffrement du message. Ce vecteur est une valeur aléatoire de taille fixe qui est utilisée pour garantir l'unicité des données cryptées.
+La variable `vector` représente un vecteur d'initialisation généré de manière aléatoire et utilisé dans le chiffrement/déchiffrement du message. Ce vecteur est une valeur aléatoire de taille fixe qui est utilisée pour garantir l'unicité des données chiffrées.
 
 On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
 
@@ -230,7 +230,7 @@ class EncryptionKey(View):
         return render(request, 'chat/friendsnav.html')
 ```
 
-Comme pour la classe `ChatModel` qui sert à enregistrer chaque message dans la base de données, sont crées deux classes `PublicKey` et `PrivateKey` pour les sauvegarder et charger correctement. Dans le code précédent, `.save()` sauvegarde la clé dans la base de données.
+Comme pour la classe `ChatModel` qui sert à enregistrer chaque message dans la base de données, sont crées deux classes `PublicKey` et `PrivateKey` (utilisées dans le code précédent) pour les sauvegarder et charger correctement. Dans le code précédent, `.save()` sauvegarde la clé dans la base de données.
 
 ```python
 class PublicKey(models.Model):
@@ -243,9 +243,9 @@ class PrivateKey(models.Model):
 ```
 ### Chiffrement des messages
 
-Il s'agit maintenant de chiffrer les messages. Dans un premier temps, il faut récupérer les clées de chiffrement qui sont stockées sur le serveur d'après le schéma.
+Il s'agit maintenant de chiffrer les messages. Il faut récupérer les clées de chiffrement qui sont stockées sur le serveur d'après le schéma.
 
-Dans un premier temps, il s'agit de mettre en place le html de la page `/chat` contenu dans `chat.html`.
+Tout d'abord, il faut mettre en place le html de la page `/chat` contenu dans `chat.html`.
 
 ```html
 <div class="chatcontainer">
@@ -261,9 +261,11 @@ Dans un premier temps, il s'agit de mettre en place le html de la page `/chat` c
 ```
 Les messages seront affichés dans la division `chat-body`. Pour les intéractions avec l'utilisateur, on retrouve un champs d'entrées `message_input`, un bouton pour uploader des images `file_input` et un bouton `submit-btn` pour envoyer le message.
 
-Il faut maintenant faire une requête GET vers l'API du serveur pour récupérer les clées.
+Il faut maintenant faire une requête GET vers l'API du serveur pour récupérer les clées une fois que la page est chargée.
 
 ```javascript
+<script>
+
 fetch("{% url 'api' %}", options).then(response => response.json()).then(json => {
 
     console.log(json);
@@ -271,12 +273,25 @@ fetch("{% url 'api' %}", options).then(response => response.json()).then(json =>
     [...]
 
 };
+
+</script>
 ```
 Seront contenues dans `json`, au format JSON les clées. 
 
-<p align="center" width="100%">
-    <img src="images/json.png" width="70%">  
-</p>
+```json
+{
+    "user": {
+        "name": "alice.azerty",
+        "UserPublicKey": "-----BEGIN RSA PUBLIC KEY-----\r\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqkoSI4NJAopDvYHKxzT+\r\n/JtYXeLuAh1D9mHWcE2ERPxdr0lWUgTeQQzDdA+g8IOgkhEtI4FWjBLi5b+ojnwM\r\nW0Iedqsy7zNsvr1oW4M8SU13vkDRcgcH4rKQ4pj168nSlEd5uvBsfHxNGoMJuyRc\r\nwIA0Nawa/tr3wdgsEs1JZKRNSnDnFnkhC9IfPqoPDlTAMy71lFp//dt1zwsQ81xw\r\natq6B0dK47NvcZ2Dkj2vTLFiJ4GW6m7Aeryy/qVcQsH9nPUMTpSOVbjjT67/rFOD\r\nM5ryWJ1RAS9OojB5OSd5Xjw2/bKDtoOWQWYAAzOAdERvZ0bjKdQjpIsBR4S8p4hY\r\n8QIDAQAB\r\n-----END RSA PUBLIC KEY-----\r\n",
+        "UserPrivateKey": "-----BEGIN RSA PRIVATE KEY-----\r\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCqShIjg0kCikO9\r\ngcrHNP78m1hd4u4CHUP2YdZwTYRE/F2vSVZSBN5BDMN0D6Dwg6CSES0jgVaMEuLl\r\nv6iOfAxbQh52qzLvM2y+vWhbgzxJTXe+QNFyBwfispDimPXrydKUR3m68Gx8fE0a\r\ngwm7JFzAgDQ1rBr+2vfB2CwSzUlkpE1KcOcWeSEL0h8+qg8OVMAzLvWUWn/923XP\r\nCxDzXHBq2roHR0rjs29xnYOSPa9MsWIngZbqbsB6vLL+pVxCwf2c9QxOlI5VuONP\r\nrv+sU4MzmvJYnVEBL06iMHk5J3lePDb9soO2g5ZBZgADM4B0RG9nRuMp1COkiwFH\r\nhLyniFjxAgMBAAECggEAD1o7NWluKST3A3xSoFAWVwbYWiqN47HowStD7n8GmEOa\r\nXKXDewSGVx4D9xA7pcNwNAsJY0STXXCMdUMouqPTZ1zYK0G3B1q/CJlB8dIsmr05\r\nuPTWDS42F0mbB1rb/QSGkCi7gE+RsE1ylBvRQkZ+eDp2uooIKwbpxFetbYqFfeWu\r\nfCrsnNcb3hrQlyNFvyrCOLKMS4qA5juygHH6dHXcFGDlgnvs1HeMVjrQfNJlBZzn\r\n5lnC9puk9cULHzl1oBcwif0hurOXj5aJwyz5vwHyq/MFbGoec2yLKdNA3rdd5Ol2\r\nGIEU0gJTbNrVcSEmBIUaGJTg0lZ4mhsAWQHA2xH8+QKBgQDeAjXE9hLzZbZwkFTd\r\nh30ySA3cnFi2A6GOMtNUI5hVrLnMJRdRANRJZ3DpEybCPmT+JEXJH+1Ov/sWACOF\r\nR08+vqTaPaiRBbUM3wyR/PT029gOk7plNMEwK3HYSiBA/JQuf472P68MjY1C1mZX\r\nd4oapLJ1AG2j2rGxPPIT26cYFQKBgQDEXK96F2YrV99iQOTJFrBTg9jDQ2fIxpNj\r\nJvP0xYbyMxeNvsUjh03x/dHCF3+yzURf4qqDcmUKSf8fB5/DjDaO5bF0xp+BWFRe\r\nPZAVKvlbanhqWMheAfuqddwrY0PwVmtPOemF69np0QnARkYlQPadvLXGY31g76A7\r\nF5ahOMS4bQKBgQCZqknxZKnFUxeuXhh/pXJgxULi+kzk3yqJtGBWErU0R/Pqe5nh\r\n9YL6s+CRUzI2rN1Wk2DCT5kAMx3mIn5zl+If+fE9JgRxLNQebpzSx5X9jdXEcThJ\r\nKPS3FLseDGC62pjuflhD1dyiAbBPHPuFezZaLrlfBsbc7Vik5xxf5l+H6QKBgQCm\r\nelo/rdTuTGrUd2ZA4p6Nv8uoCN7Vxx2wQ5czX8CAWTbP8vxamd1InEQZRSj747Hj\r\nhV3BYdwuM/w7R5B5Dsg2sKCZ+8fBtqyY1aLxf2S3z3XV2/3MTewbYh9PHbK88de6\r\n7MOCyioPZS3aOPpBnWk45IRMdY8X/zEeyGnpuCJ4pQKBgEvtwbaINOrevZJWeqDe\r\nFIU7/BOf+mU9eB7eAT4nU6ibsp9WwGMy9ha4cwUMaPgOEcsuWWhNz+QH7PrBJ6RF\r\npS1fScNpXrvQp71cifHQ+X3y+phZ669UdR4caj3tz82LyTu9FRwwlG1GVHZOKnlx\r\nvTFKIVGS0on/9PGNupnwm1DG\r\n-----END RSA PRIVATE KEY-----\r\n"
+    },
+    "friend": {
+        "name": "bob.qwerty",
+        "FriendPublicKey": "-----BEGIN RSA PUBLIC KEY-----\r\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqu4yedpNZdlCLJTyaJES\r\nx8t97ndPHreueOy1dSofad64PQQmfW+DJYCj/nevbOMV1qGzOWYmGPSMkvM3sO0G\r\nI1tRMLITcn5I/z1SIUnidO8bv+x+sARkk5cwG2MNlEx5L3lH0e2ujWRdorXukx2D\r\nP9iP5WIYpxLczZLbkpIjSQNQD8B4IUawllle0PXr3UKncVYZQJrT4akJLtyYWL91\r\ns2XePsuOPy2adn6VdYKCz2nyU7e1HYQWMLUMdoRa1U2iCnskbqyfgqPRc9EnDjoE\r\nfIusbX931JPall0RhTqGWXeC2Cq1hm0eLYSwLVf65yj3KfwZTXt/Pm6apKFhqDRg\r\ngwIDAQAB\r\n-----END RSA PUBLIC KEY-----\r\n",
+        "FriendPrivateKey": "-----BEGIN RSA PRIVATE KEY-----\r\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCq7jJ52k1l2UIs\r\nlPJokRLHy33ud08et6547LV1Kh9p3rg9BCZ9b4MlgKP+d69s4xXWobM5ZiYY9IyS\r\n8zew7QYjW1EwshNyfkj/PVIhSeJ07xu/7H6wBGSTlzAbYw2UTHkveUfR7a6NZF2i\r\nte6THYM/2I/lYhinEtzNktuSkiNJA1APwHghRrCWWV7Q9evdQqdxVhlAmtPhqQku\r\n3JhYv3WzZd4+y44/LZp2fpV1goLPafJTt7UdhBYwtQx2hFrVTaIKeyRurJ+Co9Fz\r\n0ScOOgR8i6xtf3fUk9qWXRGFOoZZd4LYKrWGbR4thLAtV/rnKPcp/BlNe38+bpqk\r\noWGoNGCDAgMBAAECggEAPFnw+YQiCsFsc3g9pL0AQAnx01ZN2b8p+6k8Inu2breE\r\nHosOGgDa8c1bWdghWNVPGyKpuKz/65TA44u7kJ0Hq0ktP//IDQdYt8ILcxR2wCnC\r\nhv+19Wj/p/rcMfdFzqQ3r5LnUFBW7rZOt0n8S/ZCJrNMj0WVBbyLuIvPOg+eJMNR\r\n1m35HGq8eW2rjepK8ALvKhcyrk5dZflfslF95MY6Yra2qPaPPAUQOaksZV38Wb7v\r\nGPT6ape9bADyT9GfEknxfQHa3qOs/23IBM3okuqicDwSqId+pgLD8rtLWeVTog0l\r\n+RWUEqwnL8yL5RvltaC2C4QU4ZlkVP8N5EzyhE8yCQKBgQDlLBRCLRAIERSAHxp+\r\nSmj2R6+AxJwSDoMmcwSM01n420BLIsRMVdbLHXbEUNEFag2oSk1Qhut2iPAOtVek\r\nIMAu1YcscwhKuOFngkpJKq6IRMBdoKYWKTxLon1DkwAQM8Qdvwo2gzHMAgpb1lyw\r\nWAFAlZEvnKsyG8a1ZZxHec/K+wKBgQC+8LUYGzaklIjqRYbUDjJmxFyoCKjNx8+D\r\nKTmayzioQ1UxUC2wdgGPCL1Q26Yi7bJDnDVmpS/ezVpkfFsevBvPV8P4xilIhfRn\r\ncp7A+3eOZX27n6BGsmPsETS7MoEd/vhvdNX7nFLZRS+7l5aW2gbxExo6pnBT4TTX\r\n9fFfcidKGQKBgG2ebAJLc8OoB9pRBmcqSJKlL3m0kcLBVlJp6d9CqWKz3UkTVDn/\r\nRULa0RiOX6zrUaUSBXFjV/XXApzGeSl00PiWApZsX6b+UDMmy0m8NMfRuwIN+ePX\r\nzZOQIcLU6c7WNBTWcJgqoQMoZrQPET74mYC/CjdwBSNuzdmuxNYbmh1JAoGAEnZx\r\n/Fe9S+K07no0lFKfGwLHttPHhsZYUWVuFYKrAtIn7bHECTkP44XD0Iq8oMn9H75+\r\nB2PXoiKXJ/pCUVF9Gupwn6CBo2qYfFw/74chQ1qa8sZ3l/5t3Qi44ZT7mSvrV9Oj\r\nUUYHWMzw1aHNxN5mJ29ibONlHyc6ldtJMKJ4HBkCgYEArPQVchFoyb9P9Z87FAQc\r\nGIU7A/pkLTTgiCrkPs5kbI7+vqHU7qi27w0vvYzxZ2/yLssJh4aJfGkhE7+7BAwA\r\nRr6gARB2jS550Pi6C2vGxEyqhiojg0sQ0qdmaVHd3G+Xg2wiKJNPJdn2filgKyUl\r\nkqNkr1qBWZ3kvaS0viMda3I=\r\n-----END RSA PRIVATE KEY-----\r\n"
+    }
+}
+```
 
 Elles sont retournées par la vue `EncryptionKey`. La méthode `get` vérifie si les utilisateurs courant de la conversation ont des clées existantes puis les retourne sous la forme d'une classe `JsonResponse`.
 
@@ -343,6 +358,8 @@ const algorithm = {
         ['encrypt']
     ).then(function(friendpublicKey){
 
+        //Zone de chiffrement des messages
+
         [...]
 
     };
@@ -354,6 +371,8 @@ const algorithm = {
         false,
         ['decrypt']
     ).then(function(userprivateKey){
+
+        //Zone de déchiffrement des messages
 
         [...]
 
@@ -367,24 +386,37 @@ Maintenant, on peut directement utiliser la clé publique `friendpublicKey` de l
 Le chiffrement se passe de cette manière : dès que l'utilisateur appuie sur le bouton `chat-message-submit`, on récupère le contenu du message `message_input`. On chiffre le message avec la méthode `crypto.subtle.encrypt` et on le récupère dans la variable `ciphertext`.
 
 ```javascript
-document.querySelector('#chat-message-submit').onclick = function(e){
+crypto.subtle.importKey(
+    'spki',
+    convertPemToBinary(json.friend.FriendPublicKey),
+    algorithm,
+    false,
+    ['encrypt']
+).then(function(friendpublicKey){
 
-    const message_input = document.querySelector('#message_input');
-    const message = message_input.value;
+    //Zone de chiffrement des messages
 
-    crypto.subtle.encrypt(
-        {
-            name: 'RSA-OAEP',
-        },
-        friendpublicKey,
-        textToArrayBuffer(message)
-    ).then(function(ciphertext){
+    document.querySelector('#chat-message-submit').onclick = function(e){
 
-        console.log(ciphertext);
+        const message_input = document.querySelector('#message_input');
+        const message = message_input.value;
 
-        [...]
+        crypto.subtle.encrypt(
+            {
+                name: 'RSA-OAEP',
+            },
+            friendpublicKey,
+            textToArrayBuffer(message)
+        ).then(function(ciphertext){
 
-    });
+            console.log(ciphertext);
+
+            //Zone d'envoie du message au destinataire
+
+            [...]
+
+        });
+    };
 };
 ```
 
@@ -395,3 +427,69 @@ Le `ciphertext` obtenu est alors un `Uint8Array` qui sera transmis.
 ```
 
 On peut noter que pour un même message, la version chiffré sera toujours différente.
+
+### Déchiffrement des messages
+
+Il ne reste plus qu'à faire l'opération inverse chez le destinataire. Ce dernier va utiliser sa clé privée pour déchiffrer le message reçu directement dans le code contenu dans la pge HTML. A chaque message reçu (au travers de `
+socket.onmessage`, une partie du rapport y est dédié pour les explications), le code vérifie si le message reçu est bien pour l'amis auquel le message a été envoyé puis la trame chiffrée est analysé pour récupérer les entiers contenus correspondant au message. `crypto.subtle.decrypt` se charge de rendre l'array d'entier `message` en texte clair déchiffré. La phase finale consiste à ajouter le message déchiffré à la division `chat-body`. Certains éléments de codes laisse penser que le projet prend en charge le chiffrement des images, plus d'informations dans [02_04_solutions_techniques_quelques_informations](https://github.com/MalloryLP/sendapp/blob/main/doc/02_02_solutions_techniques_quelques_informations_supplémentaires.md).
+```Javascript
+crypto.subtle.importKey(
+    'pkcs8',
+    convertPemToBinary(json.user.UserPrivateKey),
+    algorithm,
+    false,
+    ['decrypt']
+).then(function(userprivateKey){
+
+    //Zone de déchiffrement des messages
+
+    socket.onmessage = function(e){
+        const data = JSON.parse(e.data);
+        if(data.username != username){
+
+            const values = data.message.split(",");
+            const numbers = values.map(value => parseInt(value, 10));
+            const message = Uint8Array.from(numbers);
+
+            if(data.type == "text"){
+
+                crypto.subtle.decrypt(
+                    {
+                        name: "RSA-OAEP",
+                    },
+                    userprivateKey,
+                    message
+                ).then(function(message){
+                    const uncrypted_message = arrayBufferToText(message)
+                    document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #b6b6b6;margin:10px;">${data.username} : ${uncrypted_message}<\div>`;
+                })
+
+            }else{
+
+                //Réception des images !
+
+                [...]
+            }  
+        }
+    }
+});
+```
+
+## Problème !
+
+Pour utiliser la les méthodes `crypto.subtle` de l'api Javascript, il faut être dans un environnement "sécurisé". Or, lorsqu'on commence à developper un serveur basé sur Django, toutes les requêtes se fond en HTTP. Il faut pouvoir faire en sorte que les requêtes soient en HTTPS.
+
+<p align="center" width="100%">
+    <img src="images/cryptosubtle.png" width="70%">  
+</p>
+
+<p align="center" width="100%">
+    <img src="images/cryptosubtle2.png" width="70%">  
+</p>
+
+Dans la [documentation Django](https://docs.djangoproject.com/fr/4.1/topics/security/), les étapes pour déployer le site vers le HTTPS sont assez bien décrites.
+
+Cela impose plusieurs choses :
+- Changement des paramètres initiaux du serveur dans `settings.py`
+- [Création d'un certificat SSL](https://github.com/MalloryLP/sendapp/blob/main/doc/02_02_solutions_techniques_quelques_informations_supplémentaires.md) pour le serveur (non décrit dans la documentation et impératif pour bénificier du protocole HTTPS)
+- Ne plus suivre la documentation de Django pour implémenter les websockets (le plus inquiétant), ce que fournit Django ne fonctionne pas dans un contexte sécurisé

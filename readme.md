@@ -36,7 +36,7 @@ python -m pipenv shell
 
 ## Lancement
 
-Sur Linux dans deux sheels venv distincs :
+Sur Linux dans deux shells venv distincs :
 ```shell
 TODO
 ```
@@ -57,7 +57,7 @@ daphne -e ssl:8001:privateKey=./sendapp/code.pem:certKey=./sendapp/certif.pem se
 
 Si vous rencontrez un problème lié aux modèles de données :
 - Supprimez la base de données `db.sqlite3`
-- Lancez la commande
+- Lancez la commande :
 ```shell
 python manage.py migrate --run-syncdb
 ```
