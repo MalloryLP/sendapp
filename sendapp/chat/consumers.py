@@ -37,8 +37,6 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         print("Daphne - message received")
         data = json.loads(text_data)
 
-        print(data)
-
         type = data['type']
         message = data['message']
         username = data['username']
