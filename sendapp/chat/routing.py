@@ -4,5 +4,5 @@ from django.urls import path
 from chat.consumers import PersonalChatConsumer
 
 ws_urlpatterns = {
-    path('ws/<int:id>/', PersonalChatConsumer.as_asgi())
+    path('wss/<int:id>/', PersonalChatConsumer.as_asgi())
 }
