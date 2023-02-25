@@ -28,4 +28,81 @@ On peut maintenant utiliser la librairie `crypto.subtle`.
 
 ## Transmission des images
 
-## Sauvegarde des messages dans la base de données
+Vous pourrez remarquer de la messagerie permet l'envoie d'images, cependant, cela n'est pas chiffré pour le moment. Quand l'utilisateur clique sur le bouton pour charger une image, cette dernière est sérialisée dans un tableau de d'entiers 8 bits. Ce tableau est transmit directement par le protocole websocket au destinataire.
+
+```javascript
+image_input.addEventListener("change", function(){
+    if(image_input.files.length > 0){
+        var file = image_input.files[0];
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = function() {
+            var data = new Uint8Array(reader.result);      
+
+            /*crypto.subtle.encrypt(
+                {
+                    name: 'RSA-OAEP',
+                },
+                publicKey,
+                data
+            ).then(function(ciphertext){
+                var image = new Uint8Array(ciphertext)
+                console.log(image)
+            })*/
+
+            socket.send(JSON.stringify({
+                'type': 'image',
+                'message': new Uint8Array(reader.result).toString(),
+                'username' : username
+            }));
+
+            var blob = new Blob([data], {type: "image/jpeg"});
+            var imageURL = URL.createObjectURL(blob);
+            var image_output = document.createElement("img");
+            image_output.src = imageURL;
+
+            document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #838383;margin:10px;">${username} : <\div>`;
+            document.getElementById("chat-body").appendChild(image_output);
+
+            image_input.value = '';
+
+        }                    
+    }
+})
+```
+
+J'ai essayé de mettre en place un système de chiffrement mais n'a pas fonctionner du fait que `crypto.subtle.encrypt` est asynchrone. La première idée était de découper l'array contenant les données en blocs à chiffrer et à transmettre. Il se trouve que les paquets n'arrivaient pas dans le bonne ordre (asynchrone). Pour contrer cela, les paquets étaient numérotés et le client n'avait plus qu'à reconstruire dans l'odre l'array à la réception. Il se trouve qu'à certains moments, la numérotation était éronné pour une majorité de paquets en fin de transmission et le déchiffrement ne se passait pas comme prévu. La méthode n'est pas adapté. J'ai décidé de laisser cette fonctionnalité non chiffrée pour le moment.
+
+Le code correspondant à la réception de l'array non chiffré est le suivant :
+
+```javascript
+socket.onmessage = function(e){
+
+    [...]
+    
+    if(data.type == "text"){
+        crypto.subtle.decrypt(
+            {
+                name: "RSA-OAEP",
+            },
+            userprivateKey,
+            message
+        ).then(function(message){
+            const uncrypted_message = arrayBufferToText(message)
+            //document.querySelector('#user-body').innerHTML += `${username} :`;
+            document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #b6b6b6;margin:10px;">${data.username} : ${uncrypted_message}<\div>`;
+        })
+    }else{
+
+        var blob = new Blob([message], {type: "image/jpeg"});
+        var imageURL = URL.createObjectURL(blob);
+        var image_output = document.createElement("img");
+        image_output.src = imageURL;
+
+        document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #838383;margin:10px;">${data.username} : <\div>`;
+        document.getElementById("chat-body").appendChild(image_output);
+    }
+}
+```
+
+Si le message n'est pas du texte, alors c'est une image. L'instanciation d'un objet `Blob` permet de reconstruire une image à partir d'un array.

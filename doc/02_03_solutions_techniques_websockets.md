@@ -22,8 +22,6 @@ En utilisant WebSocket, les applications web peuvent établir une connexion perm
     <img src="images/websocket.png" width="70%">  
 </p>
 
-
-
 ## Mise en place du protocole
 
 ### Définitions
@@ -47,9 +45,9 @@ Ce code est lié à la configuration de Django Channels, qui est un paquetage ti
 
 ASGI (Asynchronous Server Gateway Interface) est une spécification d'interface pour les serveurs Web qui permettent une gestion asynchrone des demandes HTTP/HTTPS et des connexions WebSocket. ASGI fournit une interface unifiée pour gérer à la fois les connexions HTTP/HTTPS et WebSocket, ainsi que d'autres protocoles asynchrones.
 
-Le paramètre ASGI_APPLICATION spécifie l'application ASGI à utiliser. Cela signifie que les canaux Django utiliseront l'attribut application du module sendapp.asgi comme point d'entrée pour le traitement des demandes ASGI.
+Le paramètre `ASGI_APPLICATION` spécifie l'application ASGI à utiliser. Cela signifie que les canaux Django utiliseront l'attribut application du module sendapp.asgi comme point d'entrée pour le traitement des demandes ASGI.
 
-Le paramètre CHANNEL_LAYERS spécifie les couches à utiliser pour gérer les connexions WebSocket. Dans le code donné, une seule couche est définie, qui est une couche de canal en mémoire avec le backend channels.layers.InMemoryChannelLayer. Cela signifie que Django Channels une couche en mémoire pour gérer les connexions WebSocket.
+Le paramètre `CHANNEL_LAYERS` spécifie les couches à utiliser pour gérer les connexions WebSocket. Dans le code donné, une seule couche est définie, qui est une couche de canal en mémoire avec le backend channels.layers.InMemoryChannelLayer. Cela signifie que Django Channels une couche en mémoire pour gérer les connexions WebSocket.
 
 Maintenant, il faut définir un point d'accès pour maintenir la connexion entre le client et le serveur (principe du websocket). Ce point d'accès est défini dans le fichier `rooting.py` (fichier à créer) :
 
@@ -85,7 +83,13 @@ on remarque les références au certificat SSL et à `ASGI_APPLICATION` dans la 
 
 ### Fonctionnement
 
-Tout commence par le client, c'est lui qui doit initier la connexion websocket. Tout ce passe à la page `/chat`, la première chose à faire est de créer un objet WebSocket disponible grâce à l'API Javascript. Cela permet de créer une connexion vers le serveur à l'adresse décrite plus haut.
+Voici une visualisation du parcourt du message au travers des différents acteurs (flèche rouge) :
+
+<p align="center" width="100%">
+    <img src="images/socket_message.png" width="90%">  
+</p>
+
+Tout commence par les clients, c'est à deux d'initier la connexion websocket. Cela passe à la page `/chat`, la première chose à faire est de créer un objet WebSocket disponible grâce à l'API Javascript. Il permet de créer une connexion vers le serveur à l'adresse décrite plus haut.
 
 ```javascript
 // ws : websocket
@@ -132,7 +136,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
     [...]
 ```
 
-Maintenant que les connexions et les fin de discussions gérées au niveau du backend, on peut spécifier le client du status de la connexion au serveur avec les event listener `socket.onopen`, `socket.onclose` ou encore `socket.onerror`. 
+Maintenant que les connexions et les fin de discussions gérées au niveau du backend, on peut spécifier au client du status de la connexion au serveur avec les event listener `socket.onopen`, `socket.onclose` ou encore `socket.onerror`. 
 
 ```javascript
 socket.onopen = function(e){
@@ -199,7 +203,6 @@ socket.onmessage = function(e){
                 message
             ).then(function(message){
                 const uncrypted_message = arrayBufferToText(message)
-                //document.querySelector('#user-body').innerHTML += `${username} :`;
                 document.querySelector('#chat-body').innerHTML += `<div class="message" style="background-color: #b6b6b6;margin:10px;">${data.username} : ${uncrypted_message}<\div>`;
             })
         }else{
@@ -278,3 +281,5 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         user_id = self.scope['user'].id
         ChatModel.objects.create(sender=user_id, message=message, thread_name=thread_name)
 ```
+
+Avec toutes ces informations, vous êtes maintenant en mesure de comprendre tous les mécanismes qui ont été mis en place tant sur au niveau du backend avec Django et Daphne qu'au niveau du frontend pour la transmission de message chiffrés !
