@@ -1,14 +1,14 @@
 # Les solutions techniques - Les websockets
 
-Maintenant que nous sommes capable de générer des clées de chiffrement, chiffrer et déchiffrer des messages, il s'agirait de pouvoir les transmette au destinaire !
+Maintenant que nous sommes capables de générer des clés de chiffrement, chiffrer et déchiffrer des messages, il s'agirait de pouvoir les transmette au destinataire !
 
-On voit directement le problème qui va arriver : comment faire en sorte que quand les utilisateurs sont en train de s'envoyer des messages, ceux-ci s'affiche en temps réel ?
+On voit directement le problème qui va arriver : comment faire en sorte que quand les utilisateurs sont en train de s'envoyer des messages, ceux-ci s'affichent en temps réel ?
 
 Deux solutions :
 - Actualiser la page `/chat` à intervalle de temps constant
 - Utiliser les websockets
 
-La première solution me parait trop simple et pas très élégante. Tandis que la seconde est beaucoup plus interessante techniquement. J'ai donc décidé de mettre en place le protocole websocket dans ce projet.
+La première solution me paraît trop simple et pas très élégante. Tandis que la seconde est beaucoup plus intéressante techniquement. J'ai donc décidé de mettre en place le protocole websocket dans ce projet.
 
 ## Qu'est-ce que ce protocole ?
 
@@ -16,7 +16,7 @@ Le protocole WebSocket est un protocole de communication réseau bi-directionnel
 
 Il permet aux applications web de communiquer de manière plus efficace et en temps réel avec le serveur en évitant les limites du protocole HTTP, qui est principalement conçu pour une communication client-serveur unidirectionnelle.
 
-En utilisant WebSocket, les applications web peuvent établir une connexion permanente avec le serveur et envoyer et recevoir des données en temps réel sans avoir besoin de rafraîchir la page ou de réenvoyer la demande à chaque fois. Cela permet une communication bidirectionnelle en temps réel, ce qui est utile pour des applications telles que les jeux en ligne, les salles de chat, la surveillance de l'état en temps réel...
+En utilisant WebSocket, les applications web peuvent établir une connexion permanente avec le serveur et envoyer et recevoir des données en temps réel sans avoir besoin de rafraîchir la page ou de renvoyer la demande à chaque fois. Cela permet une communication bidirectionnelle en temps réel, ce qui est utile pour des applications telles que les jeux en ligne, les salles de chat, la surveillance de l'état en temps réel...
 
 <p align="center" width="100%">
     <img src="images/websocket.png" width="70%">  
@@ -26,7 +26,7 @@ En utilisant WebSocket, les applications web peuvent établir une connexion perm
 
 ### Définitions
 
-Dans un environement non sécurisé, Django peut prendre en charge la gestion des websockets. La méthode de developpement est décrite dans la documentation dans notre cas, elle doit être adaptée.
+Dans un environnement non sécurisé, Django peut prendre en charge la gestion des websockets. La méthode de développement est décrite dans la documentation dans notre cas, elle doit être adaptée.
 
 Dans le fichier de configuration `settings.py`, il faut ajouter :
 
@@ -59,7 +59,7 @@ ws_urlpatterns = {
 }
 ```
 
-Toutes les requêtes qui pointerons vers `wss/<int:id>/` seront envoyées à la couche `PersonalChatConsumer` (une sorte de vue) qui est définie dans le fichier `consumers.py`. Le `<int:id>` correspond à l'id de l'amis auquel on veut envoyer un mesage.
+Toutes les requêtes qui pointeront vers `wss/<int:id>/` seront envoyées à la couche `PersonalChatConsumer` (une sorte de vue) qui est définie dans le fichier `consumers.py`. Le `<int:id>` correspond à l'id de l'amis auquel on veut envoyer un mesage.
 
 ### Problème !
 
@@ -83,7 +83,7 @@ on remarque les références au certificat SSL et à `ASGI_APPLICATION` dans la 
 
 ### Fonctionnement
 
-Voici une visualisation du parcourt du message au travers des différents acteurs (flèche rouge) :
+Voici une visualisation du parcours du message au travers des différents acteurs (flèche rouge) :
 
 <p align="center" width="100%">
     <img src="images/socket_message.png" width="90%">  
@@ -104,7 +104,7 @@ const socket = new WebSocket(
 );
 ```
 
-On sait que toutes les requêtes qui pointent vers cette adresse sont traitées par la vue `PersonalChatConsumer`. Les deux premières classes de cette méthode servent à gérer les connexions et les fin de discussions. A la connexion, la méthode `connect` va créer un groupe dans lequel seront les deux personnes qui veulent communiquer. Cela est réalisable car l'id de l'amis est contenu dans l'url de la requête et l'id de l'utilisateur est contenu dans le corps de la requête. Mettre les deux personnes dans le même groupe permet de faciliter le traitement des requêtes de sorte à ce que si l'un envoie un message, il sera forcément destiné à son amis (qui fait donc parti du groupe). La méthode `disconnect` supprime l'utilisateur qui a quitté la page du groupe. Cela permet que celui-ci puisse être ajouté à un nouveau groupe.
+On sait que toutes les requêtes qui pointent vers cette adresse sont traitées par la vue `PersonalChatConsumer`. Les deux premières classes de cette méthode servent à gérer les connexions et les fins de discussions. A la connexion, la méthode `connect` va créer un groupe dans lequel seront les deux personnes qui veulent communiquer. Cela est réalisable, car l'id de l'ami est contenu dans l'url de la requête et l'id de l'utilisateur est contenu dans le corps de la requête. Mettre les deux personnes dans le même groupe permet de faciliter le traitement des requêtes de sorte à ce que si l'un envoie un message, il sera forcément destiné à son ami (qui fait donc parti du groupe). La méthode `disconnect` supprime l'utilisateur qui a quitté la page du groupe. Cela permet que celui-ci puisse être ajouté à un nouveau groupe.
 
 ```python
 class PersonalChatConsumer(AsyncWebsocketConsumer):
@@ -136,7 +136,7 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
     [...]
 ```
 
-Maintenant que les connexions et les fin de discussions gérées au niveau du backend, on peut spécifier au client du status de la connexion au serveur avec les event listener `socket.onopen`, `socket.onclose` ou encore `socket.onerror`. 
+Maintenant que les connexions et les fins de discussions sont gérées au niveau du backend, on peut spécifier au client le status de la connexion au serveur avec les events listener `socket.onopen`, `socket.onclose` ou encore `socket.onerror`. 
 
 ```javascript
 socket.onopen = function(e){
@@ -155,7 +155,7 @@ socket.onerror = function(e){
 }
 ```
 
-L'envoie de message se fait avec la méthode `send`, et la reception de message se fait à l'évenement `socket.onmessage`.
+L'envoie de message se fait avec la méthode `send`, et la réception de message se fait à l'événement `socket.onmessage`.
 
 ```javascript
 //Envoyer un message
@@ -183,7 +183,7 @@ socket.send(JSON.stringify({
 }));
 ```
 
-La méthode de réception de message en encore plus simple, à chaque message reçu par le client, un évènement est levé par `socket.onmessage`. Sera exécuter le code associé à cet évènement (ici, le déchiffrement analysé dans [02_02_solutions_techniques_chiffrement.md](https://github.com/MalloryLP/sendapp/blob/main/doc/02_03_solutions_techniques_chiffrement.md)).
+La méthode de réception de message en encore plus simple, à chaque message reçu par le client, un événement est levé par `socket.onmessage`. Sera exécuté le code associé à cet événement (ici, le déchiffrement analysé dans [02_02_solutions_techniques_chiffrement.md](https://github.com/MalloryLP/sendapp/blob/main/doc/02_03_solutions_techniques_chiffrement.md)).
 
 ```javascript
 socket.onmessage = function(e){
@@ -216,8 +216,8 @@ socket.onmessage = function(e){
 }
 ```
 
-Il ne reste plus qu'à voir comment les messages sont traités par le backend. A chaque envoie de message par `socket.send(json)`, le message (json) est reçu par la méthode `receive`. `data` est décomposé pour récupérer le type de message (text ou image), le message chiffré et le nom de l'utilisateur qui a envoyé le message.  
-Si le message est un texte, on le sauvegarde dans la base de données, puis il est transmis à tous les membres du groupe via la méthode `chat_message`. Si le message est une image, on l'envoie à tous les membres du groupe directement via la méthode `chat_image`. Dans ces deux méthodes, on utilise la méthode `send()`, qui va déclancher un évenement `socket.onmessage` pour chaque message reçu chez le client.
+Il ne reste plus qu'à voir comment les messages sont traités par le backend. A chaque envoi de message par `socket.send(json)`, le message (json) est reçu par la méthode `receive`. `data` est décomposé pour récupérer le type de message (texte ou image), le message chiffré et le nom de l'utilisateur qui a envoyé le message.  
+Si le message est un texte, on le sauvegarde dans la base de données, puis il est transmis à tous les membres du groupe via la méthode `chat_message`. Si le message est une image, on l'envoie à tous les membres du groupe directement via la méthode `chat_image`. Dans ces deux méthodes, on utilise la méthode `send()`, qui va déclencher un événement `socket.onmessage` pour chaque message reçu chez le client.
 
 ```python
 class PersonalChatConsumer(AsyncWebsocketConsumer):
@@ -281,5 +281,3 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         user_id = self.scope['user'].id
         ChatModel.objects.create(sender=user_id, message=message, thread_name=thread_name)
 ```
-
-Avec toutes ces informations, vous êtes maintenant en mesure de comprendre tous les mécanismes qui ont été mis en place tant sur au niveau du backend avec Django et Daphne qu'au niveau du frontend pour la transmission de message chiffrés !

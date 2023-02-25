@@ -71,7 +71,7 @@ image_input.addEventListener("change", function(){
 })
 ```
 
-J'ai essayé de mettre en place un système de chiffrement mais n'a pas fonctionner du fait que `crypto.subtle.encrypt` est asynchrone. La première idée était de découper l'array contenant les données en blocs à chiffrer et à transmettre. Il se trouve que les paquets n'arrivaient pas dans le bonne ordre (asynchrone). Pour contrer cela, les paquets étaient numérotés et le client n'avait plus qu'à reconstruire dans l'odre l'array à la réception. Il se trouve qu'à certains moments, la numérotation était éronné pour une majorité de paquets en fin de transmission et le déchiffrement ne se passait pas comme prévu. La méthode n'est pas adapté. J'ai décidé de laisser cette fonctionnalité non chiffrée pour le moment.
+J'ai essayé de mettre en place un système de chiffrement mais il n'a pas fonctionné du fait que `crypto.subtle.encrypt` est asynchrone. La première idée était de découper l'array contenant les données en blocs à chiffrer et à transmettre. Il se trouve que les paquets n'arrivaient pas dans le bon ordre (asynchrone). Pour contrer cela, les paquets étaient numérotés et le client n'avait plus qu'à reconstruire dans l'ordre l'array à la réception. Il se trouve qu'à certains moments, la numérotation était érronée pour une majorité de paquets en fin de transmission et le déchiffrement ne se passait pas comme prévu. La méthode n'est pas adaptée. J'ai décidé de laisser cette fonctionnalité non chiffrée pour le moment.
 
 Le code correspondant à la réception de l'array non chiffré est le suivant :
 
@@ -106,3 +106,5 @@ socket.onmessage = function(e){
 ```
 
 Si le message n'est pas du texte, alors c'est une image. L'instanciation d'un objet `Blob` permet de reconstruire une image à partir d'un array.
+
+Avec toutes ces informations, vous êtes maintenant en mesure de comprendre tous les mécanismes qui ont été mis en place tant sur le backend avec Django et Daphne qu'au niveau du frontend pour la transmission de messages chiffrés !
