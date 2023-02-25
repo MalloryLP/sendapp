@@ -1,4 +1,7 @@
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django?color=g)
+![GitHub Pipenv locked Python version](https://img.shields.io/github/pipenv/locked/python-version/MalloryLP/sendapp)
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/MalloryLP/sendapp/django)
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/MalloryLP/sendapp/channels)
+![GitHub Pipenv locked dependency version](https://img.shields.io/github/pipenv/locked/dependency-version/MalloryLP/sendapp/django-sslserver)
 
 > [Mallory Lehuault-Parc](https://github.com/MalloryLP) - FIPA SE 2023
 
@@ -6,11 +9,11 @@
 
 SendApp est un application de messagerie instantannée qui permet d'entretenir des conversations chiffrées de bout en bout entre tous les utilisateurs.  
 
-Vous pourrez retrouver dans le répertoire [doc](https://github.com/MalloryLP/sendapp/tree/main/doc) toutes les informations et les recherches liées à ce projet. Dans le répertoire [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp) se trouve les codes le faisant fonctionner. 
+Vous pourrez retrouver dans le répertoire [doc](https://github.com/MalloryLP/sendapp/tree/main/doc) toutes les informations et les recherches liées à ce projet. Dans le répertoire [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp) ce trouve les codes faisant fonctionner la messagerie. 
 
 ## Installation
 
-Le projet se base sur [Django](https://www.djangoproject.com/) qui est un framework web open source en Python. L'application utlise le protocole Websocket, le serveur fonctionne de paire avec [Daphne](https://github.com/django/daphne) qui est un serveur de protocoles WebSocket.
+Le projet se base sur [Django](https://www.djangoproject.com/) qui est un framework web open source en Python. L'application utlise le protocole Websocket, le serveur fonctionne de paire avec [Daphne](https://github.com/django/daphne) qui est un serveur qui gère ce type de protocoles.
 
 Copie des fichiers sources depuis Github :
 ```
@@ -44,6 +47,7 @@ TODO
 Sur windows dans deux shells venv distincs :
 ```powershell
 cd sendapp
+python ./manage.py migrate --run-syncdb
 python ./manage.py runsslserver --certificate ./sendapp/certif.pem --key ./sendapp/code.pem 0.0.0.0:8000
 ```
 
@@ -59,12 +63,12 @@ Si vous rencontrez un problème lié aux modèles de données :
 - Supprimez la base de données `db.sqlite3`
 - Lancez la commande :
 ```shell
-python manage.py migrate --run-syncdb
+python ./manage.py migrate --run-syncdb
 ```
 
 Si vous avez besoin de créer un compte administrateur :
 ```shell
-python manage.py createsuperuser
+python ./manage.py createsuperuser
 ```
 
 ## Let's chat !

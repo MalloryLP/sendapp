@@ -14,9 +14,9 @@ Comme cités dans la partie précédente, on en retrouve plusieurs tels que :
 - [Flask](https://flask.palletsprojects.com/en/2.2.x/)
 - ...  
 
-Parmi ces derniers, j'ai eu plusieurs expériences avec Flask, Node.js et une avec Django. Ils ont tous leurs avantages et inconvénients. Mon choix va se porter sur Django car j'avais été très satisfait lors de ma première expérience sur un projet minimaliste en entreprise. Ce projet me permet d'aller plus loin dans le fonctionnement de ce framework.  
+Parmi ces derniers, j'ai eu plusieurs expériences avec Flask, Node.js et une avec Django. Ils ont tous leurs avantages et inconvénients. Mon choix va se porter sur Django, car j'avais été très satisfait lors de ma première expérience sur un projet minimaliste en entreprise. Ce projet me permet d'aller plus loin dans le fonctionnement de ce framework.
 
-Django est framework web haut niveau en python dont le développement a débuté en 2003. Ce framework est libre d'utilisation. Il permet de créer des serveurs web léger. Autour de Django s’est construit une communauté très active, avec au moins deux conférences par an (DjangoCon). La documentation est très bien détaillée. Une nouvelle version du framework sort tous les 8 mois environ.
+Django est framework web haut niveau en python dont le développement a débuté en 2003. Ce framework est libre d'utilisation. Il permet de créer des serveurs web léger. Autour de Django, s’est construite une communauté très active, avec au moins deux conférences par an (DjangoCon). La documentation est très bien détaillée. Une nouvelle version du framework sort tous les 8 mois environ.
 
 <p align="center" width="100%">
     <img src="images/maj.png" width="70%">  
@@ -43,7 +43,7 @@ Je pense donc que Django est vraiment adapté pour ce type de projet.
 
 ### La structure
 
-La structure de code à l’avantage d’être claire, les applications (fonctionnalités) utilisées par le serveur sont isolées dans leurs répertoires correspondants. C'est au developpeur d'imaginer la structure. Ci-dessous le répertoire du serveur [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp), dans lequel on retrouve les codes relatifs à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), aux [chats](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat), les [paramètres sur serveur](https://github.com/MalloryLP/sendapp/tree/main/sendapp/sendapp) et les répertoires liés au front-end, [static](https://github.com/MalloryLP/sendapp/tree/main/sendapp/static) et [template](https://github.com/MalloryLP/sendapp/tree/main/sendapp/templates). Le serveur est livré avec une base de données relationnelles sqlite3.
+La structure de code à l’avantage d’être claire, les applications (fonctionnalités) utilisées par le serveur sont isolées dans leurs répertoires correspondants. C'est au développeur d'imaginer la structure. Ci-dessous le répertoire du serveur [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp), dans lequel on retrouve les codes relatifs à la gestion des [comptes](https://github.com/MalloryLP/sendapp/tree/main/sendapp/accounts), aux [chats](https://github.com/MalloryLP/sendapp/tree/main/sendapp/chat), les [paramètres sur serveur](https://github.com/MalloryLP/sendapp/tree/main/sendapp/sendapp) et les répertoires liés au front-end, [static](https://github.com/MalloryLP/sendapp/tree/main/sendapp/static) et [template](https://github.com/MalloryLP/sendapp/tree/main/sendapp/templates). Le serveur est livré avec une base de données relationnelles sqlite3.
 
 
 <p align="center" width="100%">
@@ -73,12 +73,12 @@ J'ai voulu quelque chose de simple pour l'application avec une page d'accueil, d
 </p>
 
 
-L'utilisateur demande à accéder à la page principale. Il n'est pas connecté. S'offre à lui deux choix : se connecter ou s'enregistrer. Une fois qu'il aura complété le formulaire, il sera connecté et redirigé vers la page `/home`. Celle-ci propose plusieurs options comme : se déconnecter, aller dans les paramètres du compte utilisateur et accéder à la messagerie.  
-En parallèle, l'administrateur du site peut demander la page `/admin` pour administer le site et sa base de données. Cette interface est implémenté directement à la création du serveur et peut être modifiée. 
+L'utilisateur demande à accéder à la page principale. Il n'est pas connecté. S'offrent à lui deux choix : se connecter ou s'enregistrer. Une fois qu'il aura complété le formulaire, il sera connecté et redirigé vers la page `/home`. Celle-ci propose plusieurs options comme : se déconnecter, aller dans les paramètres du compte utilisateur et accéder à la messagerie.  
+En parallèle, l'administrateur du site peut demander la page `/admin` pour administer le site et sa base de données. Cette interface est implémentée directement à la création du serveur et peut être modifiée. 
 
 ### Les urls
 
-La description des urls auquels l'utilisateur à accès sont disponibles dans les fichiers urls.py de chaque répertoire d'application correspondant. A ces urls sont associés des classes traités comme des vues. Ces classes gèrent les requettes HTTP GET et POST.
+La description des urls auxquelles l'utilisateur à accès sont disponibles dans les fichiers urls.py de chaque répertoire d'application correspondant. A ces urls sont associés des classes traités comme des vues. Ces classes gèrent les requêtes HTTP GET et POST.
 
 Description des urls gérés par l'application relative à la gestion des comptes :
 ```python
@@ -140,19 +140,19 @@ class Register(View):
             return redirect('gen')
 ```
 
-Quand le navigateur fait la requête GET sur `/register`, la méthode `get` permet de retourner le formulaire d'inscription avec la méthode `render`, qui retourne la page HTML et le contexte. Le contexte est un dictionnaire pour passer informations au HTML tel que des variables ou des formulaires ici. Le formulaire d'inscription est aussi une classe, on verra son implémentation par la suite. Quand l'utilisateur veut envoyer des informations vers le serveur (données du formulaire), c'est la méthode `post` qui va être utilisé. On récupère les informations de la requêtes au travers de `request`, on traite les données et le navigateur est redirigé vers la page `gen` avec la méthode `redirect`. Le nom d'url `gen` est associé à la classe `KeyGen` comme vu plus haut.
+Quand le navigateur fait la requête GET sur `/register`, la méthode `get` permet de retourner le formulaire d'inscription avec la méthode `render`, qui retourne la page HTML et le contexte. Le contexte est un dictionnaire pour passer informations au HTML tel que des variables ou des formulaires ici. Le formulaire d'inscription est aussi une classe, on verra son implémentation par la suite. Quand l'utilisateur veut envoyer des informations vers le serveur (données du formulaire), c'est la méthode `post` qui va être utilisé. On récupère les informations de la requête au travers de `request`, on traite les données et le navigateur est redirigé vers la page `gen` avec la méthode `redirect`. Le nom d'url `gen` est associé à la classe `KeyGen` comme vu plus haut.
 
 ### Le modèle de création du compte
 
-Comme pour toutes messageries intantannées, il faut pouvoir créer son compte. Ci-dessous le formulaire d'inscription. Des informations basiques y sont demandés.
+Comme pour toutes les messageries instantannées, il faut pouvoir créer son compte. Ci-dessous le formulaire d'inscription. Des informations basiques y sont demandées.
 
 <p align="center" width="100%">
     <img src="images/register.png" width="50%"> 
 </p>
 
-Le formulaire est basé sur la classe `CustomUserRegisterForm` qui hérite de la classe `UserCreationForm`. Là est la force de ce framework, le backend est lié au frontend par l'intermédiaire de classes, ce qui permet de developper des codes clairs et lisibles, sans ambiguités.
+Le formulaire est basé sur la classe `CustomUserRegisterForm` qui hérite de la classe `UserCreationForm`. Là est la force de ce framework, le backend est lié au frontend par l'intermédiaire de classes, ce qui permet de développer des codes clairs et lisibles, sans ambiguités.
 
-Le formulaire inclut six champs, chacun avec un libellé et un widget personnalisé qui ajoute des attributs de style à chaque champ. Les six champs sont `username`, `email`, `first_name`, `last_name`, `password1`, et `password2`. Le paramètre `attr` permet de definir les attributs de style à appliquer sur les champs.
+Le formulaire inclut six champs, chacun avec un libellé et un widget personnalisé qui ajoute des attributs de style à chaque champ. Les six champs sont `username`, `email`, `first_name`, `last_name`, `password1`, et `password2`. Le paramètre `attr` permet de définir les attributs de style à appliquer sur les champs.
 
 Le formulaire utilise la méthode `save()` pour enregistrer l'utilisateur dans la base de données, en appelant la méthode `create_user()` de Django. La valeur de `commit` est définie par défaut sur True, ce qui signifie que l'utilisateur sera enregistré immédiatement en appelant la méthode `save()`.
 
@@ -176,7 +176,7 @@ class CustomUserRegisterForm(UserCreationForm):
         return user  
 ```
 
-Une fois que la classe correspondant au modèle du formulaire d'inscription est crée, il n'y a plus qu'à l'instancier dans la vue `Register`. Quand un navigateur fait une requête GET, on comprend mieux le `form = CustomUserRegisterForm()` et le fait qu'il soit retourné par la méthode avec la page `accounts/register.html`. 
+Une fois que la classe correspondant au modèle du formulaire d'inscription est créée, il n'y a plus qu'à l'instancier dans la vue `Register`. Quand un navigateur fait une requête GET, on comprend mieux le `form = CustomUserRegisterForm()` et le fait qu'il soit retourné par la méthode avec la page `accounts/register.html`. 
 
 ```python
 class Register(View):
@@ -239,7 +239,7 @@ Le principe de connexion au site est classique. Il s'agit d'un formulaire de con
     <img src="images/login.png" width="50%"> 
 </p>
 
-Son fonctionnement est très simple, son implémentation est bien décrite dans la documentation de Django. Cela ce base sur la vue `Login`. Même principe, quand un navigateur fait une requête GET sur `/login`, si l'utilisateur est déjà authenifié, on redirige vers `/home`, sinon on retourne la page HTML `login.html` contenant le formulaire de connexion.
+Son fonctionnement est très simple, son implémentation est bien décrite dans la documentation de Django. Cela ce base sur la vue `Login`. Même principe, quand un navigateur fait une requête GET sur `/login`, si l'utilisateur est déjà authentifié, on redirige vers `/home`, sinon on retourne la page HTML `login.html` contenant le formulaire de connexion.
 ```python
 class Login(View):
 
@@ -288,9 +288,9 @@ class Login(View):
 
 ### Le modèle de chat
 
-Avec Django, on peut en plus d'enregistrer les utilisateurs, créer des modèles. Définis, chaque instanciation d'un modèle sera enregistré dans la base de données, comme les utilisateurs. Ainsi, je souhaite que les messages soient enregistrés dans la base de données. Je crée un modèle `ChatModel` qui sera utilisé pour enregistrer les messages. Cela permet de ne pas avoir à faire des requêtes SQL vers la base de données pour enregister les données. Chaque instance suivie de la méthode `.save()` sera enregistrée dans la base de données.
+Avec Django, on peut en plus d'enregistrer les utilisateurs, créer des modèles. Définis, chaque instanciation d'un modèle sera enregistrée dans la base de données, comme les utilisateurs. Ainsi, je souhaite que les messages soient enregistrés dans la base de données. Je crée un modèle `ChatModel` qui sera utilisé pour enregistrer les messages. Cela permet de ne pas avoir à faire des requêtes SQL vers la base de données pour enregister les données. Chaque instance suivie de la méthode `.save()` sera enregistrée dans la base de données.
 
-Un message est caractérisée par celui qui envoie le message (`sender`), le contenu du message (`message`), le nom du thread (`thread_name`), et la date de création du message (`timestamp`). `threan_name` est un nom unique pour chaque conversations, on verra comment il est construit dans quelques lignes.
+Un message est caractérisé par celui qui envoie le message (`sender`), le contenu du message (`message`), le nom du thread (`thread_name`), et la date de création du message (`timestamp`). `threan_name` est un nom unique pour chaque conversations, on verra comment il est construit dans quelques lignes.
 
 ```python
 class ChatModel(models.Model):
@@ -308,7 +308,7 @@ Ci-dessous la page permettant d'envoyer des messages à ses amis :
     <img src="images/chat.png" width="50%"> 
 </p>
 
-L'affichage et la récupération des messages dans la base de données se passe dans la vue `Chat`. Quand on clique sur le nom d'un amis pour discutter, on passe par cet URL : `chat/<str:username>/`. Dans la photo ci-dessus, pour discutter avec Bob, la requête se fait vers `chat/bob.qwerty/`, bob.qwerty est alors contenu dans la variable `username`. La méthode `get` est chargée de récupérer les messages d'un thread spécifique et de les afficher dans le chat courant.`thread_name` est une variable utilisée dans la méthode `get()` de la classe `Chat` pour identifier le nom du fil de discussion entre deux utilisateurs. Le nom du fil de discussion est une chaîne qui identifie de manière unique un fil de discussion. Le nom du fil de discussion est généré en concaténant les ID de l'utilisateur authentifié et de l'utilisateur ami dans l'ordre croissant, séparés par un `-`.
+L'affichage et la récupération des messages dans la base de données se passent dans la vue `Chat`. Quand on clique sur le nom d'un amis pour discutter, on passe par cet URL : `chat/<str:username>/`. Dans la photo ci-dessus, pour discutter avec Bob, la requête se fait vers `chat/bob.qwerty/`, bob.qwerty est alors contenu dans la variable `username`. La méthode `get` est chargée de récupérer les messages d'un thread spécifique et de les afficher dans le chat courant.`thread_name` est une variable utilisée dans la méthode `get()` de la classe `Chat` pour identifier le nom du fil de discussion entre deux utilisateurs. Le nom du fil de discussion est une chaîne qui identifie de manière unique un fil de discussion. Le nom du fil de discussion est généré en concaténant les ID de l'utilisateur authentifié et de l'utilisateur ami dans l'ordre croissant, séparés par un `-`.
 
 ```python
 if user_id > friend_id:
@@ -327,8 +327,7 @@ C'est ainsi que la méthode `get()` charge tous les messages précédement envoy
 message_objs = ChatModel.objects.filter(thread_name=thread_name)
 ```
 
-On remarque qu'il n'y a pas de methode `post`. Les messages ne passent pas directement par le serveur Django. Les messages sont seulement chargés par Django, un autre système permet de les sauvegarder.
-
+On remarque qu'il n'y a pas de méthode `post`. Les messages ne passent pas directement par le serveur Django. Les messages sont seulement chargés par Django, un autre système permet de les sauvegarder.
 
 ```python
 class Chat(View):
@@ -358,6 +357,6 @@ class Chat(View):
     def post(self, request):
         pass
 ```
-Je ne présente pas le code HTML de la page de chat dans cette partie car il reste assez basique, sans grand intéret pour le moment.
+Je ne présente pas le code HTML de la page de chat dans cette partie, car il reste assez basique, sans grand intérêt pour le moment.
 
-Dès que cette structure à été mise en place, il s'agissait de réfléchir sur comment faire pour que deux utilisateurs puissent s'envoyer des messages en temps réel, le tout chiffré de bout en bout.
+Dès que cette structure a été mise en place, il s'agissait de réfléchir sur comment faire pour que deux utilisateurs puissent s'envoyer des messages en temps réel, le tout chiffré de bout en bout.

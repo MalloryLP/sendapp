@@ -18,9 +18,9 @@ L'AES est un algorithme de chiffrement symétrique qui est généralement utilis
 
 L'avantage principal du RSA est sa sécurité, car il est basé sur la difficulté de factoriser de grands nombres premiers (clés robustes). Le RSA est également largement utilisé dans les systèmes de signature numérique, où il est utilisé pour garantir l'authenticité et l'intégrité des données.
 
-En rédigant ce rapport, j'ai appris que dans plusieurs cas d'applications, on peut utiliser un chiffrement hybride, qui combine les avantages de l'AES et du RSA. Dans un chiffrement hybride, les données sont d'abord chiffrées avec une clé AES unique pour chaque message, puis la clé AES est elle-même chiffrée avec la clé publique RSA du destinataire avant d'être envoyée. Le destinataire peut ensuite utiliser sa clé privée pour déchiffrer la clé AES, puis utiliser cette clé pour déchiffrer le message.
+En rédigeant ce rapport, j'ai appris que dans plusieurs cas d'applications, on peut utiliser un chiffrement hybride, qui combine les avantages de l'AES et du RSA. Dans un chiffrement hybride, les données sont d'abord chiffrées avec une clé AES unique pour chaque message, puis la clé AES est elle-même chiffrée avec la clé publique RSA du destinataire avant d'être envoyée. Le destinataire peut ensuite utiliser sa clé privée pour déchiffrer la clé AES, puis utiliser cette clé pour déchiffrer le message.
 
-Avec toutes ces informations, j'ai décidé d'implémenter un algorithme de type RSA à deux clés pour cette messagerie. Dans une premier temps, je voulais montrer qu'il était possible d'implémenter un tel algorithme pour cette messagerie et mettre l'aspect sécurité de coté (en début de projet) en suivant ce schéma :
+Avec toutes ces informations, j'ai décidé d'implémenter un algorithme de type RSA à deux clés pour cette messagerie. Dans un premier temps, je voulais montrer qu'il était possible d'implémenter un tel algorithme pour cette messagerie et mettre l'aspect sécurité de coté (en début de projet) en suivant ce schéma :
 
 <p align="center" width="100%">
     <img src="images/key_gen.png" width="70%">  
@@ -32,13 +32,13 @@ Cette implémentation n'est pas du tout sécurisé et présente plusieurs faille
 
 ### Génération des clés de chiffrement
 
-En partant du principe que le serveur ne doit pas connaitre la clé privée, je décide que la génération des clées se fait chez le client. Le code générateur est transmit au client lors de la requête GET vers `/gen`.
+En partant du principe que le serveur ne doit pas connaître la clé privée, je décide que la génération des clés se fait chez le client. Le code générateur est transmit au client lors de la requête GET vers `/gen`.
 
-L'ensemble du code générateur de clées est contenu dans le Javascript de la page html `key_gen.html`. Ce code se base sur `crypto.subtle` de l'API Javascript qui permet de réaliser des opérations de chiffrement au sein d'un navigateur web.  
+L'ensemble du code générateur de clés est contenu dans le Javascript de la page html `key_gen.html`. Ce code se base sur `crypto.subtle` de l'API Javascript qui permet de réaliser des opérations de chiffrement au sein d'un navigateur web.  
 Elle est disponible dans les navigateurs modernes, tels que Google Chrome, Mozilla Firefox, Safari, Microsoft Edge, etc. Cette API fournit des fonctions pour la génération de clés, le chiffrement et le déchiffrement de données, la création de signatures numériques, et d'autres opérations.  
 Parmi les algorithmes de chiffrement disponibles dans la librairie crypto.subtle, on peut citer le chiffrement symétrique (AES, DES, etc.), le chiffrement asymétrique (RSA, ECDSA, etc.), et les fonctions de hachage (SHA-1, SHA-256, etc.).
 
-Au chargement de la page, est directement appelé la fonction `generateKey`. Cette fonction va générer une paire de clées (clé publique et privée).
+Au chargement de la page, est directement appelée la fonction `generateKey`. Cette fonction va générer une paire de clés (clé publique et privée).
 
 ```javascript
 function generateKey(alg, scope) {
@@ -71,13 +71,13 @@ var keys = await generateKey(encryptAlgorithm, scopeEncrypt).then(function(keys)
 
 Le type de clés générées est défini dans `encryptAlgorithm` :
 
-- `name`, le nom de l'agorithme de chiffrement.
+- `name`, le nom de l'algorithme de chiffrement.
 - `modulusLength`, la longueur en bits du modulus, qui est de 2048 bits dans ce cas. Le modulus est le produit des deux nombres premiers p et q utilisés dans le chiffrement RSA. Une longueur de 2048 bits est généralement considérée comme sûre pour les applications de sécurité à long terme.
-- `publicExponent`, est l'exposant public utilisé dans le chiffrement RSA. Dans ce cas, il est défini comme un tableau d'octets Uint8Array([1, 0, 1]). C'est un paramètre qui est utilisé pour chiffré les données couramment.
+- `publicExponent`, est l'exposant public utilisé dans le chiffrement RSA. Dans ce cas, il est défini comme un tableau d'octets Uint8Array([1, 0, 1]). C'est un paramètre qui est utilisé pour chiffrer les données couramment.
 - `extractable`, est un booléen qui indique si la clé générée peut être extraite de la mémoire ou non. Dans ce cas, elle est définie comme false.
 - `hash`, défini les paramètres du hachage à utiliser avec l'algorithme de chiffrement RSA-OAEP. Dans ce cas, le hachage est SHA-256, qui est une fonction de hachage cryptographique sécurisée.
 
-Dès que les clés sont générées, elles sont directement testés sur une chaine de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clées sont transmissent au serveur. Sinon, `no_key` est transmit au serveur, cela pourra être traité par la suite.
+Dès que les clés sont générées, elles sont directement testés sur une chaîne de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clées sont transmissent au serveur. Sinon, `no_key` est transmit au serveur, cela pourra être traité par la suite.
 
 ```javascript
 var message = "Quelle est la reponse de la vie ? 42."
@@ -104,7 +104,7 @@ if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
 
 La variable `vector` représente un vecteur d'initialisation généré de manière aléatoire et utilisé dans le chiffrement/déchiffrement du message. Ce vecteur est une valeur aléatoire de taille fixe qui est utilisée pour garantir l'unicité des données chiffrées.
 
-On peut remarquer que ce ne sont pas les clés qui sont transmissent directement mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est à dire qu'on transmet au serveur une version des clées en chaine de caractère.
+On peut remarquer que ce ne sont pas les clés qui sont transmissent directement, mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est à dire qu'on transmet au serveur une version des clés en chaîne de caractère.
 
 ```text
 -----BEGIN RSA PUBLIC KEY-----
@@ -173,7 +173,7 @@ function exportPrivateKey(keys) {
 }
 ```
 
-Il ne reste plus qu'à transmettre les clées de chiffrement au serveur avec la fonction `sendInfos`. Cette fonction reste assez simple, elle crée une instance `XMLHttpRequest` et l'envoie au serveur. Cette requête est dirigé vers l'url `/api` en charge des clées de chiffrement d'après la définition dans `urls.py` : `path('api/', views.EncryptionKey.as_view(), name='api')`. Sécurité oblige, doit être transmit dans le header au serveur le `crsftoken` sinon la requête n'est pas traitée. Dans le corps de la requête, on transmet le nom du propriétaire des clées et leurs valeurs.
+Il ne reste plus qu'à transmettre les clés de chiffrement au serveur avec la fonction `sendInfos`. Cette fonction reste assez simple, elle crée une instance `XMLHttpRequest` et l'envoie au serveur. Cette requête est dirigée vers l'url `/api` en charge des clées de chiffrement d'après la définition dans `urls.py` : `path('api/', views.EncryptionKey.as_view(), name='api')`. Sécurité oblige, doit être transmis dans le header au serveur le `crsftoken` sinon la requête n'est pas traitée. Dans le corps de la requête, on transmet le nom du propriétaire des clés et leurs valeurs.
 
 ```javascript
 function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
@@ -189,7 +189,7 @@ function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
 }
 ```
 
-Quand on regarde de plus près le vue associé à l'url `/api`, on peut voir qu'à chaque requête POST, le corps de la requête est analysé pour recupérer les clés de chiffrement et le nom du propriétaire des clées. Si ce nom est déjà associé à une clé de chiffrement, on met à jour la clé (impossible pour le moment mais implémenté en backend), sinon on la sauvegarde dans la base de données.
+Quand on regarde de plus près la vue associée à l'url `/api`, on peut voir qu'à chaque requête POST, le corps de la requête est analysé pour récupérer les clés de chiffrement et le nom du propriétaire des clés. Si ce nom est déjà associé à une clé de chiffrement, on met à jour la clé (impossible pour le moment, mais implémenté en backend), sinon on la sauvegarde dans la base de données.
 
 ```python
 class EncryptionKey(View):
@@ -243,7 +243,7 @@ class PrivateKey(models.Model):
 ```
 ### Chiffrement des messages
 
-Il s'agit maintenant de chiffrer les messages. Il faut récupérer les clées de chiffrement qui sont stockées sur le serveur d'après le schéma.
+Il s'agit maintenant de chiffrer les messages. Il faut récupérer les clés de chiffrement qui sont stockées sur le serveur d'après le schéma.
 
 Tout d'abord, il faut mettre en place le html de la page `/chat` contenu dans `chat.html`.
 
@@ -259,9 +259,9 @@ Tout d'abord, il faut mettre en place le html de la page `/chat` contenu dans `c
     <button class="submit-btn" id="chat-message-submit">Envoyer</button>
 </div>
 ```
-Les messages seront affichés dans la division `chat-body`. Pour les intéractions avec l'utilisateur, on retrouve un champs d'entrées `message_input`, un bouton pour uploader des images `file_input` et un bouton `submit-btn` pour envoyer le message.
+Les messages seront affichés dans la division `chat-body`. Pour les interactions avec l'utilisateur, on retrouve un champ d'entrées `message_input`, un bouton pour uploader des images `file_input` et un bouton `submit-btn` pour envoyer le message.
 
-Il faut maintenant faire une requête GET vers l'API du serveur pour récupérer les clées une fois que la page est chargée.
+Il faut maintenant faire une requête GET vers l'API du serveur pour récupérer les clés une fois que la page est chargée.
 
 ```javascript
 <script>
@@ -293,7 +293,7 @@ Seront contenues dans `json`, au format JSON les clées.
 }
 ```
 
-Elles sont retournées par la vue `EncryptionKey`. La méthode `get` vérifie si les utilisateurs courant de la conversation ont des clées existantes puis les retourne sous la forme d'une classe `JsonResponse`.
+Elles sont retournées par la vue `EncryptionKey`. La méthode `get` vérifie si les utilisateurs courant de la conversation ont des clés existantes puis les retourne sous la forme d'une classe `JsonResponse`.
 
 ```python
 class EncryptionKey(View):
@@ -324,7 +324,7 @@ class EncryptionKey(View):
                                 
         return JsonResponse({'publicKey': None, 'privateKey': None})
 ```
-Les clées récupérées doivent être converties au format binaire originel de `crypto.subtle` à l'aide de la fonction `convertPemBinary`. Ainsi, on pourra correctement l'importer avec la fonction `crypto.subtle.importKey`. Divers paramètres y sont spécifiés comme le type de clé `name: 'RSA-OAEP'`.
+Les clés récupérées doivent être converties au format binaire originel de `crypto.subtle` à l'aide de la fonction `convertPemBinary`. Ainsi, on pourra correctement l'importer avec la fonction `crypto.subtle.importKey`. Divers paramètres y sont spécifiés comme le type de clé `name: 'RSA-OAEP'`.
 
 ```javascript
 function convertPemToBinary(pem){
@@ -381,7 +381,7 @@ const algorithm = {
 
 ```
 
-Maintenant, on peut directement utiliser la clé publique `friendpublicKey` de l'amis auquel on veut envoyer un message pour le chiffrer et déchiffrer le message reçu avec sa clé privée `friendprivateKey`. 
+Maintenant, on peut directement utiliser la clé publique `friendpublicKey` de l'ami auquel on veut envoyer un message pour le chiffrer et déchiffrer le message reçu avec sa clé privée `friendprivateKey`. 
 
 Le chiffrement se passe de cette manière : dès que l'utilisateur appuie sur le bouton `chat-message-submit`, on récupère le contenu du message `message_input`. On chiffre le message avec la méthode `crypto.subtle.encrypt` et on le récupère dans la variable `ciphertext`.
 
@@ -430,8 +430,9 @@ On peut noter que pour un même message, la version chiffré sera toujours diff�
 
 ### Déchiffrement des messages
 
-Il ne reste plus qu'à faire l'opération inverse chez le destinataire. Ce dernier va utiliser sa clé privée pour déchiffrer le message reçu directement dans le code contenu dans la pge HTML. A chaque message reçu (au travers de `
-socket.onmessage`, une partie du rapport y est dédié pour les explications), le code vérifie si le message reçu est bien pour l'amis auquel le message a été envoyé puis la trame chiffrée est analysé pour récupérer les entiers contenus correspondant au message. `crypto.subtle.decrypt` se charge de rendre l'array d'entier `message` en texte clair déchiffré. La phase finale consiste à ajouter le message déchiffré à la division `chat-body`. Certains éléments de codes laisse penser que le projet prend en charge le chiffrement des images, plus d'informations dans [02_04_solutions_techniques_quelques_informations](https://github.com/MalloryLP/sendapp/blob/main/doc/02_02_solutions_techniques_quelques_informations_supplémentaires.md).
+Il ne reste plus qu'à faire l'opération inverse chez le destinataire. Ce dernier va utiliser sa clé privée pour déchiffrer le message reçu directement dans le code contenu dans la page HTML. A chaque message reçu (au travers de `
+socket.onmessage`, une partie du rapport y est dédiée pour les explications), le code vérifie si le message reçu est bien pour l'amis auquel le message a été envoyé puis la trame chiffrée est analysée pour récupérer les entiers contenus correspondant au message. `crypto.subtle.decrypt` se charge de rendre l'array d'entier `message` en texte clair déchiffré. La phase finale consiste à ajouter le message déchiffré à la division `chat-body`. Certains éléments de codes laissent penser que le projet prend en charge le chiffrement des images, plus d'informations dans [02_04_solutions_techniques_quelques_informations](https://github.com/MalloryLP/sendapp/blob/main/doc/02_02_solutions_techniques_quelques_informations_supplémentaires.md).
+
 ```Javascript
 crypto.subtle.importKey(
     'pkcs8',
@@ -477,7 +478,7 @@ crypto.subtle.importKey(
 
 ## Problème !
 
-Pour utiliser la les méthodes `crypto.subtle` de l'api Javascript, il faut être dans un environnement "sécurisé". Or, lorsqu'on commence à developper un serveur basé sur Django, toutes les requêtes se fond en HTTP. Il faut pouvoir faire en sorte que les requêtes soient en HTTPS.
+Pour utiliser les méthodes `crypto.subtle` de l'api Javascript, il faut être dans un environnement "sécurisé". Or, lorsqu'on commence à développer un serveur basé sur Django, toutes les requêtes se font en HTTP. Il faut pouvoir faire en sorte que les requêtes soient en HTTPS.
 
 <p align="center" width="100%">
     <img src="images/cryptosubtle.png" width="70%">  
@@ -491,5 +492,5 @@ Dans la [documentation Django](https://docs.djangoproject.com/fr/4.1/topics/secu
 
 Cela impose plusieurs choses :
 - Changement des paramètres initiaux du serveur dans `settings.py`
-- [Création d'un certificat SSL](https://github.com/MalloryLP/sendapp/blob/main/doc/02_02_solutions_techniques_quelques_informations_supplémentaires.md) pour le serveur (non décrit dans la documentation et impératif pour bénificier du protocole HTTPS)
+- [Création d'un certificat SSL](https://github.com/MalloryLP/sendapp/blob/main/doc/02_02_solutions_techniques_quelques_informations_supplémentaires.md) pour le serveur (non décrit dans la documentation et impératif pour bénéficier du protocole HTTPS)
 - Ne plus suivre la documentation de Django pour implémenter les websockets (le plus inquiétant), ce que fournit Django ne fonctionne pas dans un contexte sécurisé
