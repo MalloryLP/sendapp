@@ -27,7 +27,9 @@ Le projet fonctionne avec Python et dépend de ces paquets :
 
 Mise en place de l'environnement de développement sur Linux :
 ```shell
-TODO
+export PIPENV_VENV_IN_PROJECT=1
+pipenv install -r requirements.txt 
+pipenv shell
 ```
 
 Mise en place de l'environnement virtuel Python sur Windows:
@@ -41,7 +43,15 @@ python -m pipenv shell
 
 Sur Linux dans deux shells venv distincs :
 ```shell
-TODO
+cd sendapp
+python manage.py migrate --run-syncdb
+python manage.py runsslserver --certificate sendapp/certif.pem --key sendapp/code.pem 0.0.0.0:8000
+```
+
+```shell
+cd sendapp
+export DJANGO_SETTINGS_MODULE = 'sendapp.settings'
+daphne -e ssl:8001:privateKey=sendapp/code.pem:certKey=sendapp/certif.pem sendapp.asgi:application
 ```
 
 Sur windows dans deux shells venv distincs :
@@ -52,7 +62,7 @@ python ./manage.py runsslserver --certificate ./sendapp/certif.pem --key ./senda
 ```
 
 ```powershell
-cd sendapp
+cd ./sendapp
 $env:DJANGO_SETTINGS_MODULE = 'sendapp.settings'
 daphne -e ssl:8001:privateKey=./sendapp/code.pem:certKey=./sendapp/certif.pem sendapp.asgi:application
 ```
@@ -61,10 +71,7 @@ daphne -e ssl:8001:privateKey=./sendapp/code.pem:certKey=./sendapp/certif.pem se
 
 Si vous rencontrez un problème lié aux modèles de données :
 - Supprimez la base de données `db.sqlite3`
-- Lancez la commande :
-```shell
-python ./manage.py migrate --run-syncdb
-```
+- Lancez la commande : `python ./manage.py migrate --run-syncdb`
 
 Si vous avez besoin de créer un compte administrateur :
 ```shell
