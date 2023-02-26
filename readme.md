@@ -9,11 +9,11 @@
 
 SendApp est un application de messagerie instantannée qui permet d'entretenir des conversations chiffrées de bout en bout entre tous les utilisateurs.  
 
-Vous pourrez retrouver dans le répertoire [doc](https://github.com/MalloryLP/sendapp/tree/main/doc) toutes les informations et les recherches liées à ce projet. Dans le répertoire [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp) ce trouve les codes faisant fonctionner la messagerie. 
+Vous pourrez retrouver dans le répertoire [doc](https://github.com/MalloryLP/sendapp/tree/main/doc) toutes les informations et les recherches liées à ce projet. Dans le répertoire [sendapp](https://github.com/MalloryLP/sendapp/tree/main/sendapp) se trouve les codes faisant fonctionner la messagerie. 
 
 ## Installation
 
-Le projet se base sur [Django](https://www.djangoproject.com/) qui est un framework web open source en Python. L'application utlise le protocole Websocket, le serveur fonctionne de paire avec [Daphne](https://github.com/django/daphne) qui est un serveur qui gère ce type de protocoles.
+Le projet ce base sur [Django](https://www.djangoproject.com/) qui est un framework web open source en Python. L'application utlise le protocole Websocket, le serveur fonctionne de paire avec [Daphne](https://github.com/django/daphne) qui est un serveur qui gère ce type de protocoles.
 
 Copie des fichiers sources depuis Github :
 ```
@@ -86,4 +86,4 @@ Allez à l'url suivante dans votre navigateur internet préféré sur smartphone
 https://[host_machine_ip]:8000/home
 ```
 
-Connectez-vous ou créez un compte, discuttez :smiley:
+Connectez-vous ou créez un compte, discutez :smiley:

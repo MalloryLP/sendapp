@@ -349,8 +349,7 @@ class Chat(View):
             user_obj_temp = User.objects.get(id=mesg.sender)
             senders[user_obj_temp.id] = f"{user_obj_temp.username}"
             send_messg.append([f"{senders[user_obj_temp.id]}", f"{mesg.message}"])        
-            #send_messg.append([f"{mesg.sender}", f"{mesg.message}", mesg.timestamp])
-
+            
         users = User.objects.exclude(username=request.user.username)
         return render(request, 'chat/chat.html', context={'requested_user_id' : f"{friend_id}" ,'users': users, 'messages' : send_messg, 'friend' : username, 'count' : len(send_messg)})
 
