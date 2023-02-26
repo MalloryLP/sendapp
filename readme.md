@@ -25,23 +25,23 @@ Le projet fonctionne avec Python et dépend de ces paquets :
 - channels
 - django-sslserver
 
-Mise en place de l'environnement de développement sur Linux :
+Mise en place de l'environnement virtuel Python sur Linux :
 ```shell
 export PIPENV_VENV_IN_PROJECT=1
-pipenv install -r requirements.txt 
-pipenv shell
+pipenv install -r requirements.txt
 ```
+Lancement de l'environnement pipenv : `pipenv shell`
 
 Mise en place de l'environnement virtuel Python sur Windows:
 ```powershell
 $env:PIPENV_VENV_IN_PROJECT=1
 python -m pipenv install -r ./requirements.txt
-python -m pipenv shell
 ```
+Lancement de l'environnement pipenv : `python -m pipenv shell`
 
 ## Lancement
 
-Sur Linux dans deux shells venv distincs :
+Sur Linux dans deux shells pipenv distincs :
 ```shell
 cd sendapp
 python manage.py migrate --run-syncdb
@@ -54,9 +54,9 @@ export DJANGO_SETTINGS_MODULE = 'sendapp.settings'
 daphne -e ssl:8001:privateKey=sendapp/code.pem:certKey=sendapp/certif.pem sendapp.asgi:application
 ```
 
-Sur windows dans deux shells venv distincs :
+Sur windows dans deux shells pipenv distincs :
 ```powershell
-cd sendapp
+cd ./sendapp
 python ./manage.py migrate --run-syncdb
 python ./manage.py runsslserver --certificate ./sendapp/certif.pem --key ./sendapp/code.pem 0.0.0.0:8000
 ```
