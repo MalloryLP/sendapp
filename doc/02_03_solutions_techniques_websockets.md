@@ -63,7 +63,7 @@ Toutes les requêtes qui pointeront vers `wss/<int:id>/` seront envoyées à la 
 
 ### Problème !
 
-La partie précédente correspond à ce qui est décrit dans le documentation Django. Or, les requêtes sont en HTTPS, donc chiffrées. Pour établir la liaison entre un client et le serveur, plusieurs trames sont envoyées en début de communication pour définir le protocole. Django ne peut donc pas savoir qu'il s'agit du protocole websocket car il ne pourra pas les interpréter...
+La partie précédente correspond à ce qui est décrit dans la documentation Django. Or, les requêtes sont en HTTPS, donc chiffrées. Pour établir la liaison entre un client et le serveur, plusieurs trames sont envoyées en début de communication pour définir le protocole. Django ne peut donc pas savoir qu'il s'agit du protocole websocket car il ne pourra pas les interpréter...
 
 Après pas mal de recherches, j'ai découvert [Daphne](https://github.com/django/daphne). C'est un serveur ASGI qui permet de gérer les connexions WebSocket, HTTP/HTTPS et d'autres protocoles asynchrones pour les applications Python. Il est conçu pour fonctionner avec Django et d'autres frameworks. Daphne est utilisé par Django Channels comme serveur pour gérer les connexions. Pour faire simple, toutes les requêtes relatives aux websockets passeront par le serveur Daphne. 
 
@@ -183,7 +183,7 @@ socket.send(JSON.stringify({
 }));
 ```
 
-La méthode de réception de message en encore plus simple, à chaque message reçu par le client, un événement est levé par `socket.onmessage`. Sera exécuté le code associé à cet événement (ici, le déchiffrement analysé dans [02_02_solutions_techniques_chiffrement.md](https://github.com/MalloryLP/sendapp/blob/main/doc/02_03_solutions_techniques_chiffrement.md)).
+La méthode de réception de message en encore plus simple, à chaque message reçu par le client, un événement est levé par `socket.onmessage`. Sera exécuté le code associé à cet événement (ici, le déchiffrement analysé dans [02_02_solutions_techniques_chiffrement](https://github.com/MalloryLP/sendapp/doc/02_03_solutions_techniques_chiffrement.md)).
 
 ```javascript
 socket.onmessage = function(e){

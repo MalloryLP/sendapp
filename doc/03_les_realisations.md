@@ -16,7 +16,7 @@
 
 | Etat | Modifications |
 |------|---------------|
-| :orange_square: | Refonte du système de génération de clées |
+| :orange_square: | Refonte du système de génération de clés |
 | :orange_square: | Envoie d'images chiffrées |
 | :red_square: | Calendrier partagé |
 | :red_square: | Service d'emails |

@@ -20,13 +20,13 @@ L'avantage principal du RSA est sa sécurité, car il est basé sur la difficult
 
 En rédigeant ce rapport, j'ai appris que dans plusieurs cas d'applications, on peut utiliser un chiffrement hybride, qui combine les avantages de l'AES et du RSA. Dans un chiffrement hybride, les données sont d'abord chiffrées avec une clé AES unique pour chaque message, puis la clé AES est elle-même chiffrée avec la clé publique RSA du destinataire avant d'être envoyée. Le destinataire peut ensuite utiliser sa clé privée pour déchiffrer la clé AES, puis utiliser cette clé pour déchiffrer le message.
 
-Avec toutes ces informations, j'ai décidé d'implémenter un algorithme de type RSA à deux clés pour cette messagerie. Dans un premier temps, je voulais montrer qu'il était possible d'implémenter un tel algorithme pour cette messagerie et mettre l'aspect sécurité de coté (en début de projet) en suivant ce schéma :
+Avec toutes ces informations, j'ai décidé d'implémenter un algorithme de type RSA à deux clés pour cette messagerie. Dans un premier temps, je voulais montrer qu'il était possible d'implémenter un tel algorithme pour cette messagerie et de mettre l'aspect sécurité de côté (en début de projet) en suivant ce schéma :
 
 <p align="center" width="100%">
     <img src="images/key_gen.png" width="70%">  
 </p>
 
-Cette implémentation n'est pas du tout sécurisé et présente plusieurs failles comme le fait que la clé privée doit être connue que par son propriétaire (même le serveur soit l'ignorer). Le fait de la transmettre du serveur au propriétaire via une requête HTTP fait que le chiffrement est vulnérable. J'explique quelles solutions pourraient être mises en oeuvre pour contrer ces problèmes dans la partie [04_les_ameliorations](https://github.com/MalloryLP/sendapp/tree/main/doc/04_les_ameliorations.md).
+Cette implémentation n'est pas du tout sécurisé et présente plusieurs failles comme le fait que la clé privée doit être connue que par son propriétaire (même le serveur soit l'ignorer). Le fait de la transmettre du serveur au propriétaire via une requête HTTP fait que le chiffrement est vulnérable. J'explique quelles solutions pourraient être mises en oeuvre pour contrer ces problèmes dans la partie [04_les_ameliorations](https://github.com/MalloryLP/sendapp/doc/04_les_ameliorations.md).
 
 ## Mise en place du chiffrement
 
@@ -77,7 +77,7 @@ Le type de clés générées est défini dans `encryptAlgorithm` :
 - `extractable`, est un booléen qui indique si la clé générée peut être extraite de la mémoire ou non. Dans ce cas, elle est définie comme false.
 - `hash`, défini les paramètres du hachage à utiliser avec l'algorithme de chiffrement RSA-OAEP. Dans ce cas, le hachage est SHA-256, qui est une fonction de hachage cryptographique sécurisée.
 
-Dès que les clés sont générées, elles sont directement testés sur une chaîne de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clées sont transmissent au serveur. Sinon, `no_key` est transmit au serveur, cela pourra être traité par la suite.
+Dès que les clés sont générées, elles sont directement testées sur une chaîne de caractère. Si l'algorithme de chiffrement/déchiffrement permet de retrouver la chaine de caractère originelle, les clés sont transmissent au serveur. Sinon, `no_key` est transmit au serveur, cela pourra être traité par la suite.
 
 ```javascript
 var message = "Quelle est la reponse de la vie ? 42."
@@ -104,7 +104,7 @@ if(arrayBufferToText(result) == "Quelle est la reponse de la vie ? 42."){
 
 La variable `vector` représente un vecteur d'initialisation généré de manière aléatoire et utilisé dans le chiffrement/déchiffrement du message. Ce vecteur est une valeur aléatoire de taille fixe qui est utilisée pour garantir l'unicité des données chiffrées.
 
-On peut remarquer que ce ne sont pas les clés qui sont transmissent directement, mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est à dire qu'on transmet au serveur une version des clés en chaîne de caractère.
+On peut remarquer que ce ne sont pas les clés qui sont transmissent directement, mais leur équivalent exporté standardisé ([format PEM](https://www.cryptosys.net/pki/rsakeyformats.html)). C'est-à-dire qu'on transmet au serveur une version des clés en chaîne de caractère.
 
 ```text
 -----BEGIN RSA PUBLIC KEY-----
@@ -173,7 +173,7 @@ function exportPrivateKey(keys) {
 }
 ```
 
-Il ne reste plus qu'à transmettre les clés de chiffrement au serveur avec la fonction `sendInfos`. Cette fonction reste assez simple, elle crée une instance `XMLHttpRequest` et l'envoie au serveur. Cette requête est dirigée vers l'url `/api` en charge des clées de chiffrement d'après la définition dans `urls.py` : `path('api/', views.EncryptionKey.as_view(), name='api')`. Sécurité oblige, doit être transmis dans le header au serveur le `crsftoken` sinon la requête n'est pas traitée. Dans le corps de la requête, on transmet le nom du propriétaire des clés et leurs valeurs.
+Il ne reste plus qu'à transmettre les clés de chiffrement au serveur avec la fonction `sendInfos`. Cette fonction reste assez simple, elle crée une instance `XMLHttpRequest` et l'envoie au serveur. Cette requête est dirigée vers l'url `/api` en charge des clés de chiffrement d'après la définition dans `urls.py` : `path('api/', views.EncryptionKey.as_view(), name='api')`. Sécurité oblige, doit être transmis dans le header au serveur le `crsftoken` sinon la requête n'est pas traitée. Dans le corps de la requête, on transmet le nom du propriétaire des clés et leurs valeurs.
 
 ```javascript
 function sendInfos(f_exportedPublicKey, f_exportedPrivateKey){
@@ -276,7 +276,7 @@ fetch("{% url 'api' %}", options).then(response => response.json()).then(json =>
 
 </script>
 ```
-Seront contenues dans `json`, au format JSON les clées. 
+Seront contenues dans `json`, au format JSON les clés. 
 
 ```json
 {
@@ -293,7 +293,7 @@ Seront contenues dans `json`, au format JSON les clées.
 }
 ```
 
-Elles sont retournées par la vue `EncryptionKey`. La méthode `get` vérifie si les utilisateurs courant de la conversation ont des clés existantes puis les retourne sous la forme d'une classe `JsonResponse`.
+Elles sont retournées par la vue `EncryptionKey`. La méthode `get` vérifie si les utilisateurs courant de la conversation ont des clés existantes puis les retournent sous la forme d'une classe `JsonResponse`.
 
 ```python
 class EncryptionKey(View):
