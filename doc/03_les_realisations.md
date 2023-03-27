@@ -1,6 +1,6 @@
 # Ce qui a été réalisé
 
-### Réalisation impératives
+### Réalisations impératives
 
 | Etat | Fonctions |
 |------|----------|
